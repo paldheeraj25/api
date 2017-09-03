@@ -32,5 +32,5 @@ app.get('/api/products/:id', function (req, res) {
   });
 });
 
-app.listen(3333);
-console.log('Server runnning on port 3333');
+app.listen(5012);
+console.log('Server runnning on port 5012');
