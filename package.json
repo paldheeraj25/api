@@ -1,0 +1,19 @@
+{
+  "name": "Lewiot",
+  "version": "0.1.0",
+  "description": "IOT",
+  "main": "index.js",
+  "author": "Dheeraj Pal",
+  "license": "MIT",
+  "engines": {
+    "node": "0.10.x"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "*",
+    "cors": "^2.8.4",
+    "express": "*",
+    "mongoose": "*",
+    "passport": "^0.4.0"
+  }
+}
