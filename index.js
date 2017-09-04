@@ -1,14 +1,55 @@
 var express = require('express');
-app = express();
 var mongoose = require('mongoose');
 var bodyParser = require('body-parser');
+var expressValidator = require('express-validator');
+var session = require('express-session');
+var MongoDBStore = require('connect-mongodb-session')(session);
+var passport = require('passport');
+var util = require('util');
+var bcrypt = require('bcryptjs');
+const saltRounds = 10;
+
+//app config
+app = express();
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
+app.use(bodyParser.json());
+app.use(expressValidator());
+var store = new MongoDBStore(
+  {
+    uri: 'mongodb://localhost/lewiot',
+    collection: 'mySessions'
+  });
+
+// Catch errors 
+store.on('error', function (error) {
+  assert.ifError(error);
+  assert.ok(false);
+});
+app.use(session({
+  secret: 'keyboard cat',
+  resave: false,
+  saveUninitialized: true,
+  store: store
+  //cookie: { secure: true }
+}));
+app.use(passport.initialize());
+app.use(passport.session());
+
+
+//database models
 Products = require('./models/products');
+Users = require('./models/users');
+
 //Connecg to mongoose
 mongoose.connect('mongodb://localhost/lewiot/users');
 var db = mongoose.connect;
 const cors = require('cors');
+
 app.use(cors({ origin: "*" }));
 
+//api's
 app.get('/', function (req, res) {
   res.send('api server');
 });
@@ -31,6 +72,74 @@ app.get('/api/products/:id', function (req, res) {
     return res.send(product);
   });
 });
+
+app.get('/api/logout', function (req, res) {
+  console.log('logout');
+  //right now clearing session may need to change
+  store.clear(function (error) {
+    if (error)
+      throw error;
+    res.send("logout");
+  });
+
+});
+
+app.post('/api/register', function (req, res) {
+
+  req.checkBody('username', 'username cannot be empaty').notEmpty();
+  req.checkBody('email', 'The email you entered is invalid').isEmail();
+  const error = req.validationErrors();
+  if (error) {
+    res.send(error);
+  }
+  var user = {
+    username: req.body.username,
+    email: req.body.email,
+    password: req.body.password
+  };
+
+  return Users.findOne({ email: user.email }).then(function (data) {
+    if (data) {
+      return res.send({ error: 'user already exist' });
+    } else {
+      bcrypt.hash(user.password, saltRounds, function (err, hash) {
+        Users.create({ 'username': user.username, 'email': user.email, 'password': hash }).then(function (data) {
+          if (data) {
+            var id = data._id;
+            req.login(id, function (err) {
+              if (!err) {
+                console.log(req.user);
+                console.log(req.isAuthenticated());
+                res.send(data);
+              } else {
+                throw error;
+              }
+            });
+          }
+        });
+      });
+    }
+  }, function (error) {
+    throw error;
+  });
+});
+
+//passport js for authentication
+passport.serializeUser(function (id, done) {
+  done(null, id);
+});
+
+passport.deserializeUser(function (id, done) {
+  done(null, id);
+});
+
+function authenticationMiddleware() {
+  return (req, res, next) => {
+    console.log(`req.session.passport.user: ${JSON.stringify(req.session.passport)}`);
+    if (req.isAuthenticated()) return next();
+    return res.send({ 'error': 'unauthorised' });
+  };
+}
 
 app.listen(5012);
 console.log('Server runnning on port 5012');
