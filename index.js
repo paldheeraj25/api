@@ -5,6 +5,7 @@ var expressValidator = require('express-validator');
 var session = require('express-session');
 var MongoDBStore = require('connect-mongodb-session')(session);
 var passport = require('passport');
+var LocalStrategy = require('passport-local').Strategy;
 var util = require('util');
 var bcrypt = require('bcryptjs');
 const saltRounds = 10;
@@ -84,6 +85,16 @@ app.get('/api/logout', function (req, res) {
 
 });
 
+app.post('/api/login', passport.authenticate('local'), function (req, res) {
+  res.send({ success: 'login successfull' });
+});
+
+app.get('/api/logout', function (req, res) {
+  req.logout();
+  req.session.destroy();
+  res.send({ success: 'logout successfull' });
+});
+
 app.post('/api/register', function (req, res) {
 
   req.checkBody('username', 'username cannot be empaty').notEmpty();
@@ -108,8 +119,8 @@ app.post('/api/register', function (req, res) {
             var id = data._id;
             req.login(id, function (err) {
               if (!err) {
-                console.log(req.user);
-                console.log(req.isAuthenticated());
+                //console.log(req.user);
+                //console.log(req.isAuthenticated());
                 res.send(data);
               } else {
                 throw error;
@@ -140,6 +151,37 @@ function authenticationMiddleware() {
     return res.send({ 'error': 'unauthorised' });
   };
 }
+
+passport.use(new LocalStrategy(
+  {
+    usernameField: 'email',
+    passwordField: 'password'
+  },
+  function (username, password, done) {
+    Users.findOne({ email: username }, function (err, user) {
+      if (err) { return done(err); }
+      if (!user) {
+        return done(null, false, { message: 'Incorrect username.' });
+      }
+      // if (!user.validPassword(password)) {
+      //   return done(null, false, { message: 'Incorrect password.' });
+      // }
+      //console.log(user);
+      var hash = user.password;
+      bcrypt.compare(password, hash, function (err, res) {
+        //console.log(res);
+        if (res === true) {
+          return done(null, { id: user._id });
+        } else {
+          return done(null, false, { 'error': 'incorrect password' });
+        }
+      });
+
+      //console.log(username);
+      //console.log(password);
+    });
+  }
+));
 
 app.listen(5012);
 console.log('Server runnning on port 5012');

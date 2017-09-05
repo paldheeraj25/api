@@ -20,6 +20,7 @@
     "joi": "^10.6.0",
     "mongoose": "*",
     "passport": "^0.4.0",
+    "passport-local": "^1.0.0",
     "util": "^0.10.3",
     "utils": "^0.3.1"
   }
