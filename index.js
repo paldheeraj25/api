@@ -4,11 +4,20 @@ var bodyParser = require('body-parser');
 var expressValidator = require('express-validator');
 var session = require('express-session');
 var MongoDBStore = require('connect-mongodb-session')(session);
+var jwt = require('jsonwebtoken');
 var passport = require('passport');
-var LocalStrategy = require('passport-local').Strategy;
+var passportJWT = require("passport-jwt");
 var util = require('util');
 var bcrypt = require('bcryptjs');
 const saltRounds = 10;
+
+var ExtractJwt = passportJWT.ExtractJwt;
+var JwtStrategy = passportJWT.Strategy;
+
+var jwtOptions = {};
+console.log(ExtractJwt);
+jwtOptions.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
+jwtOptions.secretOrKey = 'secret';
 
 //app config
 app = express();
@@ -36,7 +45,7 @@ app.use(session({
   //cookie: { secure: true }
 }));
 app.use(passport.initialize());
-app.use(passport.session());
+//app.use(passport.session());
 
 
 //database models
@@ -55,14 +64,15 @@ app.get('/', function (req, res) {
   res.send('api server');
 });
 
-app.get('/api/products', function (req, res) {
-  Products.getAll(function (err, products) {
-    if (err) {
-      throw err;
-    }
-    return res.send(products);
+app.get('/api/products', passport.authenticate('jwt', { session: false }),
+  function (req, res) {
+    Products.getAll(function (err, products) {
+      if (err) {
+        throw err;
+      }
+      return res.send(products);
+    });
   });
-});
 
 app.get('/api/products/:id', function (req, res) {
   var tagId = req.headers.id;
@@ -75,7 +85,6 @@ app.get('/api/products/:id', function (req, res) {
 });
 
 app.get('/api/logout', function (req, res) {
-  console.log('logout');
   //right now clearing session may need to change
   store.clear(function (error) {
     if (error)
@@ -85,9 +94,30 @@ app.get('/api/logout', function (req, res) {
 
 });
 
-app.post('/api/login', passport.authenticate('local'), function (req, res) {
-  res.send({ success: 'login successfull' });
-});
+app.post('/api/login',
+  function (req, res) {
+    var email = req.body.email;
+    var password = req.body.password;
+    Users.findOne({ email: email }, function (err, user) {
+      if (err) { return done(err); }
+      if (!user) {
+        return res.status(401).json({ message: "no such user found" });
+      }
+      var hash = user.password;
+      bcrypt.compare(password, hash, function (err, reponse) {
+        //console.log(res);
+        if (reponse === true) {
+          var payload = { id: user._id };
+          console.log(payload);
+          var token = jwt.sign(payload, jwtOptions.secretOrKey);
+          return res.send({ message: "ok", token: token });
+        } else {
+          return res.status(401).json({ message: "passwords did not match" });
+        }
+      });
+      //res.send({ user: req.session });
+    });
+  });
 
 app.get('/api/logout', function (req, res) {
   req.logout();
@@ -135,53 +165,18 @@ app.post('/api/register', function (req, res) {
   });
 });
 
-//passport js for authentication
-passport.serializeUser(function (id, done) {
-  done(null, id);
-});
+passport.use(new JwtStrategy(jwtOptions, function (jwt_payload, done) {
+  console.log('payload received', jwt_payload);
+  // usually this would be a database call:
+  Users.findOne({ _id: jwt_payload.id }, function (err, user) {
+    if (err) { return done(err, false); }
+    if (!user) {
+      return done(null, false);
+    }
+    return done(null, user);
+  });
+}));
 
-passport.deserializeUser(function (id, done) {
-  done(null, id);
-});
-
-function authenticationMiddleware() {
-  return (req, res, next) => {
-    console.log(`req.session.passport.user: ${JSON.stringify(req.session.passport)}`);
-    if (req.isAuthenticated()) return next();
-    return res.send({ 'error': 'unauthorised' });
-  };
-}
-
-passport.use(new LocalStrategy(
-  {
-    usernameField: 'email',
-    passwordField: 'password'
-  },
-  function (username, password, done) {
-    Users.findOne({ email: username }, function (err, user) {
-      if (err) { return done(err); }
-      if (!user) {
-        return done(null, false, { message: 'Incorrect username.' });
-      }
-      // if (!user.validPassword(password)) {
-      //   return done(null, false, { message: 'Incorrect password.' });
-      // }
-      //console.log(user);
-      var hash = user.password;
-      bcrypt.compare(password, hash, function (err, res) {
-        //console.log(res);
-        if (res === true) {
-          return done(null, { id: user._id });
-        } else {
-          return done(null, false, { 'error': 'incorrect password' });
-        }
-      });
-
-      //console.log(username);
-      //console.log(password);
-    });
-  }
-));
 
 app.listen(5012);
 console.log('Server runnning on port 5012');
