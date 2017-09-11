@@ -3,11 +3,12 @@ var mongoose = require('mongoose');
 var bodyParser = require('body-parser');
 var expressValidator = require('express-validator');
 var session = require('express-session');
-var MongoDBStore = require('connect-mongodb-session')(session);
 var jwt = require('jsonwebtoken');
 var passport = require('passport');
 var passportJWT = require("passport-jwt");
 var util = require('util');
+const csvparse = require('js-csvparser');
+const _ = require('lodash');
 var bcrypt = require('bcryptjs');
 const saltRounds = 10;
 
@@ -15,7 +16,6 @@ var ExtractJwt = passportJWT.ExtractJwt;
 var JwtStrategy = passportJWT.Strategy;
 
 var jwtOptions = {};
-console.log(ExtractJwt);
 jwtOptions.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
 jwtOptions.secretOrKey = 'secret';
 
@@ -26,26 +26,7 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(bodyParser.json());
 app.use(expressValidator());
-var store = new MongoDBStore(
-  {
-    uri: 'mongodb://localhost/lewiot',
-    collection: 'mySessions'
-  });
-
-// Catch errors 
-store.on('error', function (error) {
-  assert.ifError(error);
-  assert.ok(false);
-});
-app.use(session({
-  secret: 'keyboard cat',
-  resave: false,
-  saveUninitialized: true,
-  store: store
-  //cookie: { secure: true }
-}));
 app.use(passport.initialize());
-//app.use(passport.session());
 
 
 //database models
@@ -74,6 +55,31 @@ app.get('/api/products', passport.authenticate('jwt', { session: false }),
     });
   });
 
+app.post('/api/upload', passport.authenticate('jwt', { session: false }),
+  function (req, res) {
+    var encoded = req.body.csv;
+    var decoded = Buffer.from(encoded, 'base64').toString();
+    decodedCsv = csvparse(decoded);
+    var csvHeader = decodedCsv.header[0];
+
+    function generateCsvObject(object) {
+      return _.zipObject(csvHeader, object);
+    }
+
+    var dataBaseObject = _.chain(decodedCsv.data)
+      .map(function (object) {
+        return generateCsvObject(object);
+      })
+      .initial()
+      .value();
+
+    return Products.create(dataBaseObject).then(function (data) {
+      return res.status(200).json({ message: "saved" });
+    }, function (err) {
+      throw err;
+    });
+  });
+
 app.get('/api/products/:id', function (req, res) {
   var tagId = req.headers.id;
   return Products.getOne(tagId, function (err, product) {
@@ -86,11 +92,7 @@ app.get('/api/products/:id', function (req, res) {
 
 app.get('/api/logout', function (req, res) {
   //right now clearing session may need to change
-  store.clear(function (error) {
-    if (error)
-      throw error;
-    res.send("logout");
-  });
+  res.send("logout");
 
 });
 
@@ -105,17 +107,14 @@ app.post('/api/login',
       }
       var hash = user.password;
       bcrypt.compare(password, hash, function (err, reponse) {
-        //console.log(res);
         if (reponse === true) {
           var payload = { id: user._id };
-          console.log(payload);
           var token = jwt.sign(payload, jwtOptions.secretOrKey);
           return res.send({ message: "ok", token: token });
         } else {
           return res.status(401).json({ message: "passwords did not match" });
         }
       });
-      //res.send({ user: req.session });
     });
   });
 
