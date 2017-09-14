@@ -124,45 +124,48 @@ app.get('/api/logout', function (req, res) {
   res.send({ success: 'logout successfull' });
 });
 
-app.post('/api/register', function (req, res) {
-
-  req.checkBody('username', 'username cannot be empaty').notEmpty();
-  req.checkBody('email', 'The email you entered is invalid').isEmail();
-  const error = req.validationErrors();
-  if (error) {
-    res.send(error);
-  }
-  var user = {
-    username: req.body.username,
-    email: req.body.email,
-    password: req.body.password
-  };
-
-  return Users.findOne({ email: user.email }).then(function (data) {
-    if (data) {
-      return res.send({ error: 'user already exist' });
-    } else {
-      bcrypt.hash(user.password, saltRounds, function (err, hash) {
-        Users.create({ 'username': user.username, 'email': user.email, 'password': hash }).then(function (data) {
-          if (data) {
-            var id = data._id;
-            req.login(id, function (err) {
-              if (!err) {
-                //console.log(req.user);
-                //console.log(req.isAuthenticated());
-                res.send(data);
-              } else {
-                throw error;
-              }
-            });
-          }
-        });
-      });
+app.post('/api/register', passport.authenticate('jwt', { session: false }),
+  function (req, res) {
+    console.log(req.body);
+    req.checkBody('username', 'username cannot be empaty').notEmpty();
+    req.checkBody('email', 'The email you entered is invalid').isEmail();
+    const error = req.validationErrors();
+    if (error) {
+      res.send(error);
     }
-  }, function (error) {
-    throw error;
+    var user = {
+      username: req.body.username,
+      email: req.body.email,
+      password: req.body.password,
+      role: req.body.role,
+      active: req.body.active
+    };
+
+    return Users.findOne({ email: user.email }).then(function (data) {
+      if (data) {
+        return res.send({ error: 'user already exist' });
+      } else {
+        bcrypt.hash(user.password, saltRounds, function (err, hash) {
+          Users.create({ 'username': user.username, 'email': user.email, 'password': hash }).then(function (data) {
+            if (data) {
+              var id = data._id;
+              req.login(id, function (err) {
+                if (!err) {
+                  //console.log(req.user);
+                  //console.log(req.isAuthenticated());
+                  res.send(data);
+                } else {
+                  throw error;
+                }
+              });
+            }
+          });
+        });
+      }
+    }, function (error) {
+      throw error;
+    });
   });
-});
 
 passport.use(new JwtStrategy(jwtOptions, function (jwt_payload, done) {
   console.log('payload received', jwt_payload);

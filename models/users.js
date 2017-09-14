@@ -11,6 +11,14 @@ var productSchema = mongoose.Schema({
   password: {
     type: String,
     required: false
+  },
+  role: {
+    type: String,
+    required: false
+  },
+  active: {
+    type: String,
+    required: false
   }
 });
 
