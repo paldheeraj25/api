@@ -1,7 +1,7 @@
 var express = require('express');
 var mongoose = require('mongoose');
 var bodyParser = require('body-parser');
-var expressValidator = require('express-validator');
+//var expressValidator = require('express-validator');
 var session = require('express-session');
 var jwt = require('jsonwebtoken');
 var passport = require('passport');
@@ -25,7 +25,7 @@ app.use(bodyParser.urlencoded({
   extended: true
 }));
 app.use(bodyParser.json());
-app.use(expressValidator());
+//app.use(expressValidator());
 app.use(passport.initialize());
 
 
@@ -127,12 +127,12 @@ app.get('/api/logout', function (req, res) {
 app.post('/api/register', passport.authenticate('jwt', { session: false }),
   function (req, res) {
     console.log(req.body);
-    req.checkBody('username', 'username cannot be empaty').notEmpty();
-    req.checkBody('email', 'The email you entered is invalid').isEmail();
-    const error = req.validationErrors();
-    if (error) {
-      res.send(error);
-    }
+    // req.checkBody('username', 'username cannot be empaty').notEmpty();
+    // req.checkBody('email', 'The email you entered is invalid').isEmail();
+    // const error = req.validationErrors();
+    // if (error) {
+    //   res.send(error);
+    // }
     var user = {
       username: req.body.username,
       email: req.body.email,
