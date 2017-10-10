@@ -32,6 +32,7 @@ app.use(passport.initialize());
 //database models
 Products = require('./models/products');
 Users = require('./models/users');
+Batches = require('./models/batches');
 
 //Connecg to mongoose
 mongoose.connect('mongodb://localhost/lewiot/users');
@@ -54,30 +55,41 @@ app.get('/api/products', passport.authenticate('jwt', { session: false }),
       return res.send(products);
     });
   });
-
-app.post('/api/upload', passport.authenticate('jwt', { session: false }),
+//passport.authenticate('jwt', { session: false }),
+app.post('/api/upload',
   function (req, res) {
-    var encoded = req.body.csv;
-    var decoded = Buffer.from(encoded, 'base64').toString();
-    decodedCsv = csvparse(decoded);
-    var csvHeader = decodedCsv.header[0];
 
-    function generateCsvObject(object) {
-      return _.zipObject(csvHeader, object);
-    }
+    var batchData = req.body.metadata;
+    var batchId = req.body.metadata.productBatch;
+    var batchTagids = req.body.idList;
 
-    var dataBaseObject = _.chain(decodedCsv.data)
-      .map(function (object) {
-        return generateCsvObject(object);
-      })
-      .initial()
-      .value();
-
-    return Products.create(dataBaseObject).then(function (data) {
-      return res.status(200).json({ message: "saved" });
-    }, function (err) {
-      throw err;
+    return Batches.getAll(function (err, products) {
+      if (err) {
+        throw err;
+      }
+      return res.status(200).json({ message: products });
     });
+
+    // var decoded = Buffer.from(encoded, 'base64').toString();
+    // decodedCsv = csvparse(decoded);
+    // var csvHeader = decodedCsv.header[0];
+
+    // function generateCsvObject(object) {
+    //   return _.zipObject(csvHeader, object);
+    // }
+
+    // var dataBaseObject = _.chain(decodedCsv.data)
+    //   .map(function (object) {
+    //     return generateCsvObject(object);
+    //   })
+    //   .initial()
+    //   .value();
+
+    // return Products.create(dataBaseObject).then(function (data) {
+    //   return res.status(200).json({ message: "saved" });
+    // }, function (err) {
+    //   throw err;
+    // });
   });
 
 app.get('/api/products/:id', function (req, res) {
