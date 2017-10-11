@@ -60,36 +60,28 @@ app.post('/api/upload',
   function (req, res) {
 
     var batchData = req.body.metadata;
-    var batchId = req.body.metadata.productBatch;
+    var batchId = req.body.metadata.batchId;
     var batchTagids = req.body.idList;
-
-    return Batches.getAll(function (err, products) {
-      if (err) {
-        throw err;
-      }
-      return res.status(200).json({ message: products });
+    var productDetails = {
+      batchId: batchId,
+      name: batchData.name,
+      image: { url: batchData.image, show: true },
+      heading: { value: batchData.heading, show: true },
+      description: { value: batchData.description, show: true },
+      manufacture: { value: batchData.manufacture, show: true },
+      expire: { value: batchData.expire, show: true },
+      country: { value: batchData.country, show: true },
+      city: { value: batchData.city, show: true }
+    };
+    Batches.save({ batchId: batchId, tagId: batchTagids }, function (err, batch) {
+      if (err)
+        return err;
+      Products.save(productDetails, function (err, product) {
+        if (err)
+          throw err;
+        return res.status(200).json({ data: product });
+      });
     });
-
-    // var decoded = Buffer.from(encoded, 'base64').toString();
-    // decodedCsv = csvparse(decoded);
-    // var csvHeader = decodedCsv.header[0];
-
-    // function generateCsvObject(object) {
-    //   return _.zipObject(csvHeader, object);
-    // }
-
-    // var dataBaseObject = _.chain(decodedCsv.data)
-    //   .map(function (object) {
-    //     return generateCsvObject(object);
-    //   })
-    //   .initial()
-    //   .value();
-
-    // return Products.create(dataBaseObject).then(function (data) {
-    //   return res.status(200).json({ message: "saved" });
-    // }, function (err) {
-    //   throw err;
-    // });
   });
 
 app.get('/api/products/:id', function (req, res) {
