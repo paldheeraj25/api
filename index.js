@@ -46,7 +46,7 @@ app.get('/', function (req, res) {
   res.send('api server');
 });
 
-app.get('/api/products', passport.authenticate('jwt', { session: false }),
+app.get('/api/products', //passport.authenticate('jwt', { session: false }),
   function (req, res) {
     Products.getAll(function (err, products) {
       if (err) {
@@ -65,13 +65,15 @@ app.post('/api/upload',
     var productDetails = {
       batchId: batchId,
       name: batchData.name,
-      image: { url: batchData.image, show: true },
-      heading: { value: batchData.heading, show: true },
-      description: { value: batchData.description, show: true },
-      manufacture: { value: batchData.manufacture, show: true },
-      expire: { value: batchData.expire, show: true },
-      country: { value: batchData.country, show: true },
-      city: { value: batchData.city, show: true }
+      metadata: [
+        { name: "image", url: batchData.image, show: true },
+        { name: "heading", value: batchData.heading, show: true },
+        { name: "description", value: batchData.description, show: true },
+        { name: "manufacture", value: batchData.manufacture, show: true },
+        { name: "expire", value: batchData.expire, show: true },
+        { name: "country", value: batchData.country, show: true },
+        { name: "city", value: batchData.city, show: true }
+      ]
     };
     Batches.save({ batchId: batchId, tagId: batchTagids }, function (err, batch) {
       if (err)
