@@ -8,55 +8,7 @@ var productSchema = mongoose.Schema({
     type: String,
     required: true
   },
-  image: {
-    type: {
-      url: String,
-      show: Boolean
-    },
-    required: false
-  },
-  heading: {
-    type: {
-      value: String,
-      show: Boolean
-    },
-    required: false
-  },
-  description: {
-    type: {
-      value: String,
-      show: Boolean
-    },
-    required: false
-  },
-  city: {
-    type: {
-      value: String,
-      show: Boolean
-    },
-    required: false
-  },
-  country: {
-    type: {
-      value: String,
-      show: Boolean
-    },
-    required: false
-  },
-  manufacture: {
-    type: {
-      value: String,
-      show: Boolean
-    },
-    required: false
-  },
-  expire: {
-    type: {
-      value: String,
-      show: Boolean
-    },
-    required: false
-  }
+  metadata: [{ name: String, value: String, show: Boolean }]
 });
 
 var Products = module.exports = mongoose.model('Products', productSchema);

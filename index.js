@@ -66,7 +66,7 @@ app.post('/api/upload',
       batchId: batchId,
       name: batchData.name,
       metadata: [
-        { name: "image", url: batchData.image, show: true },
+        { name: "image", value: batchData.image, show: true },
         { name: "heading", value: batchData.heading, show: true },
         { name: "description", value: batchData.description, show: true },
         { name: "manufacture", value: batchData.manufacture, show: true },
