@@ -17,12 +17,16 @@ var productSchema = mongoose.Schema({
     required: false
   },
   active: {
-    type: String,
+    type: Boolean,
     required: false
   }
 });
 
 var Users = module.exports = mongoose.model('users', productSchema);
+
+module.exports.getAll = function (callback, limit) {
+  Users.find(callback).limit(limit);
+};
 
 module.exports.getOne = function (user, callback) {
   Users.findOne({ email: user.email }, callback);
@@ -36,3 +40,7 @@ module.exports.addUser = function (user, callback) {
   }
 }
 
+module.exports.delete = function(user, callback) {
+  console.log(user);
+  Users.remove(user, callback);
+}
