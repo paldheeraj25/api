@@ -149,26 +149,19 @@ app.post('/api/register', //passport.authenticate('jwt', { session: false }),
       role: req.body.role,
       active: req.body.active
     };
-
-    Users.addUser(user, function (err, user) {
-      if (err) {
-        throw err;
-      }
-      console.log(user);
-      return res.send(user);
+    bcrypt.hash(user.password, saltRounds, function (err, hash) {
+        user.password = hash;
+        Users.addUser(user, function (err, user) {
+          if (err) {
+            throw err;
+          }
+          return res.send(user);
+        });
     });
   });
 
-app.delete('/api/users/:id', function(req, res){
-  var user = {
-    username: req.body.username,
-    email: req.body.email,
-    password: req.body.password,
-    role: req.body.role,
-    active: req.body.active
-  };
-
-  Users.delete(user, function (err, user) {
+app.delete('/api/user/:id', function(req, res){
+  Users.delete(req.params.id, function (err, user) {
     if (err) {
       throw err;
     }
@@ -177,7 +170,6 @@ app.delete('/api/users/:id', function(req, res){
 });
 
 passport.use(new JwtStrategy(jwtOptions, function (jwt_payload, done) {
-  console.log('payload received', jwt_payload);
   // usually this would be a database call:
   Users.findOne({ _id: jwt_payload.id }, function (err, user) {
     if (err) { return done(err, false); }

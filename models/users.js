@@ -29,7 +29,7 @@ module.exports.getAll = function (callback, limit) {
 };
 
 module.exports.getOne = function (user, callback) {
-  Users.findOne({ email: user.email }, callback);
+  Users.findOne({ _id: user._id }, callback);
 }
 
 module.exports.addUser = function (user, callback) {
@@ -40,7 +40,6 @@ module.exports.addUser = function (user, callback) {
   }
 }
 
-module.exports.delete = function(user, callback) {
-  console.log(user);
-  Users.remove(user, callback);
+module.exports.delete = function(id, callback) {
+  Users.deleteOne( { "_id" : id }, callback );
 }
