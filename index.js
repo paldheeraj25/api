@@ -1,6 +1,9 @@
 var express = require('express');
 var mongoose = require('mongoose');
 var bodyParser = require('body-parser');
+var constants = require('./consts');
+var authService = require('./authService');
+
 //var expressValidator = require('express-validator');
 var session = require('express-session');
 var jwt = require('jsonwebtoken');
@@ -30,12 +33,12 @@ app.use(passport.initialize());
 
 
 //database models
-Products = require('./models/products');
-Users = require('./models/users');
-Batches = require('./models/batches');
+Products = require(constants.models.products);
+Users = require(constants.models.users);
+Batches = require(constants.models.batches);
 
 //Connecg to mongoose
-mongoose.connect('mongodb://localhost/lewiot/users');
+mongoose.connect(constants.db);
 var db = mongoose.connect;
 const cors = require('cors');
 
@@ -46,7 +49,7 @@ app.get('/', function (req, res) {
   res.send('api server');
 });
 
-app.get('/api/products', //passport.authenticate('jwt', { session: false }),
+app.get(constants.apis.products, //passport.authenticate('jwt', { session: false }),
   function (req, res) {
     Products.getAll(function (err, products) {
       if (err) {
@@ -86,7 +89,7 @@ app.post('/api/upload',
     });
   });
 
-app.get('/api/products/:id', function (req, res) {
+app.get(constants.apis.products + ':id', function (req, res) {
   var tagId = req.headers.id;
   return Products.getOne(tagId, function (err, product) {
     if (err) {
@@ -96,42 +99,18 @@ app.get('/api/products/:id', function (req, res) {
   });
 });
 
-app.get('/api/logout', function (req, res) {
-  //right now clearing session may need to change
-  res.send("logout");
-
-});
-
 app.post('/api/login',
   function (req, res) {
-    var email = req.body.email;
-    var password = req.body.password;
-    Users.findOne({ email: email }, function (err, user) {
-      if (err) { return done(err); }
-      if (!user) {
-        return res.status(401).json({ message: "no such user found" });
-      }
-      var hash = user.password;
-      bcrypt.compare(password, hash, function (err, reponse) {
-        if (reponse === true) {
-          var payload = { id: user._id };
-          var token = jwt.sign(payload, jwtOptions.secretOrKey);
-          return res.send({ message: "ok", token: token });
-        } else {
-          return res.status(401).json({ message: "passwords did not match" });
-        }
-      });
-    });
+    authService.login(req, res);
   });
 
 app.get('/api/logout', function (req, res) {
-  req.logout();
-  req.session.destroy();
-  res.send({ success: 'logout successfull' });
+  authService.logout(req, res);
 });
 
 /* Users APIs */
-app.get('/api/users', function(req, res) {
+app.get(constants.apis.users, function(req, res) {
+  console.log("users");
   Users.getAll(function (err, users) {
     if (err) {
       throw err;
@@ -142,25 +121,10 @@ app.get('/api/users', function(req, res) {
 
 app.post('/api/register', //passport.authenticate('jwt', { session: false }),
   function (req, res) {
-    var user = {
-      username: req.body.username,
-      email: req.body.email,
-      password: req.body.password,
-      role: req.body.role,
-      active: req.body.active
-    };
-    bcrypt.hash(user.password, saltRounds, function (err, hash) {
-        user.password = hash;
-        Users.addUser(user, function (err, user) {
-          if (err) {
-            throw err;
-          }
-          return res.send(user);
-        });
-    });
+    authService.register(req, res);
   });
 
-app.delete('/api/user/:id', function(req, res){
+app.delete(constants.apis.users + ':id', function(req, res){
   Users.delete(req.params.id, function (err, user) {
     if (err) {
       throw err;
