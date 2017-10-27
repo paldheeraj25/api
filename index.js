@@ -99,18 +99,17 @@ app.get(constants.apis.products + ':id', function (req, res) {
   });
 });
 
-app.post('/api/login',
+app.post(constants.login,
   function (req, res) {
     authService.login(req, res);
   });
 
-app.get('/api/logout', function (req, res) {
+app.get(constants.logout, function (req, res) {
   authService.logout(req, res);
 });
 
 /* Users APIs */
 app.get(constants.apis.users, function(req, res) {
-  console.log("users");
   Users.getAll(function (err, users) {
     if (err) {
       throw err;
@@ -124,7 +123,7 @@ app.post('/api/register', //passport.authenticate('jwt', { session: false }),
     authService.register(req, res);
   });
 
-app.delete(constants.apis.users + ':id', function(req, res){
+app.delete(constants.apis.users + '/:id', function(req, res){
   Users.delete(req.params.id, function (err, user) {
     if (err) {
       throw err;

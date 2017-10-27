@@ -11,6 +11,9 @@ models.batches = models.base + "/batches";
 //RestFul APIs
 var apis = {};
 apis.base = "/api";
+var login = apis.base + "/login";
+var logout = apis.base + "/logout";
+
 apis.products = apis.base + "/products";
 apis.users = apis.base + "/users";
 apis.batches = apis.base + "/batches";
@@ -18,5 +21,7 @@ apis.batches = apis.base + "/batches";
 module.exports = {
   db : db,
   apis: apis,
+  login : login,
+  logout : logout,
   models: models
 }
