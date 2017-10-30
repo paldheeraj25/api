@@ -1,5 +1,5 @@
 var mongoose = require("mongoose");
-var productSchema = mongoose.Schema({
+var userSchema = mongoose.Schema({
   username: {
     type: String,
     required: false
@@ -22,7 +22,7 @@ var productSchema = mongoose.Schema({
   }
 });
 
-var Users = module.exports = mongoose.model('users', productSchema);
+var Users = module.exports = mongoose.model('users', userSchema);
 
 module.exports.getAll = function (callback, limit) {
   Users.find(callback).limit(limit);

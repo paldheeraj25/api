@@ -21,7 +21,6 @@ module.exports.getOne = function (tagid, callback) {
 };
 
 module.exports.save = function (batchInfo, callback) {
-  console.log(batchInfo);
   var batch = new Batches(batchInfo);
   batch.save(callback);
 };
