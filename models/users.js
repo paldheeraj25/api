@@ -1,5 +1,5 @@
 var mongoose = require("mongoose");
-var productSchema = mongoose.Schema({
+var userSchema = mongoose.Schema({
   username: {
     type: String,
     required: false
@@ -17,15 +17,19 @@ var productSchema = mongoose.Schema({
     required: false
   },
   active: {
-    type: String,
+    type: Boolean,
     required: false
   }
 });
 
-var Users = module.exports = mongoose.model('users', productSchema);
+var Users = module.exports = mongoose.model('users', userSchema);
+
+module.exports.getAll = function (callback, limit) {
+  Users.find(callback).limit(limit);
+};
 
 module.exports.getOne = function (user, callback) {
-  Users.findOne({ email: user.email }, callback);
+  Users.findOne({ _id: user._id }, callback);
 }
 
 module.exports.addUser = function (user, callback) {
@@ -36,3 +40,6 @@ module.exports.addUser = function (user, callback) {
   }
 }
 
+module.exports.delete = function(id, callback) {
+  Users.deleteOne( { "_id" : id }, callback );
+}
