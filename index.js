@@ -55,6 +55,11 @@ app.get('/api/products', //passport.authenticate('jwt', { session: false }),
       return res.send(products);
     });
   });
+
+app.get('/api/advertisement', //passport.authenticate('jwt', { session: false }),
+  function (req, res) {
+    res.send({ test: "test" });
+  });
 //passport.authenticate('jwt', { session: false }),
 app.post('/api/upload',
   function (req, res) {
