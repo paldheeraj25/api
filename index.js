@@ -49,7 +49,7 @@ app.get('/', function (req, res) {
   res.send('api server');
 });
 
-app.get(constants.apis.products, //passport.authenticate('jwt', { session: false }),
+app.get(constants.apis.products, passport.authenticate('jwt', { session: false }),
   function (req, res) {
     Products.getAll(function (err, products) {
       if (err) {
@@ -58,7 +58,6 @@ app.get(constants.apis.products, //passport.authenticate('jwt', { session: false
       return res.send(products);
     });
   });
-//passport.authenticate('jwt', { session: false }),
 app.post('/api/upload',
   function (req, res) {
 
