@@ -31,7 +31,7 @@ app.use(bodyParser.json());
 //app.use(expressValidator());
 app.use(passport.initialize());
 
-
+app.use(express.static('./dist'));
 //database models
 Products = require(constants.models.products);
 Users = require(constants.models.users);
@@ -114,7 +114,7 @@ app.get(constants.logout, function (req, res) {
 });
 
 /* Users APIs */
-app.get(constants.apis.users, function(req, res) {
+app.get(constants.apis.users, function (req, res) {
   Users.getAll(function (err, users) {
     if (err) {
       throw err;
@@ -128,7 +128,7 @@ app.post('/api/register', //passport.authenticate('jwt', { session: false }),
     authService.register(req, res);
   });
 
-app.delete(constants.apis.users + '/:id', function(req, res){
+app.delete(constants.apis.users + '/:id', function (req, res) {
   Users.delete(req.params.id, function (err, user) {
     if (err) {
       throw err;
@@ -149,5 +149,5 @@ passport.use(new JwtStrategy(jwtOptions, function (jwt_payload, done) {
 }));
 
 
-app.listen(5012);
-console.log('Server runnning on port 5012');
+app.listen(8080);
+console.log('Server runnning on port 8080');
