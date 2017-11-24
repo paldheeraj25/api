@@ -149,5 +149,5 @@ passport.use(new JwtStrategy(jwtOptions, function (jwt_payload, done) {
 }));
 
 
-app.listen(8080);
-console.log('Server runnning on port 8080');
+app.listen(80);
+console.log('Server runnning on port 80');
