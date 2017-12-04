@@ -23,8 +23,8 @@ router.get('/api/products/:id', function (req, res) {
   });
 });
 
-//upload product
-router.post('/api/upload',
+//upload product check: check for passport authentication via making const passport global or use here
+router.post('/api/upload',//passport.authenticate('jwt', { session: false }),
   function (req, res) {
 
     var batchData = req.body.metadata;

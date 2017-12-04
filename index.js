@@ -33,6 +33,7 @@ app.use(bodyParser.json());
 app.use(passport.initialize());
 
 app.use(express.static('./dist'));
+
 //database models
 Products = require(constants.models.products);
 Users = require(constants.models.users);
@@ -48,80 +49,10 @@ app.use(cors({ origin: "*" }));
 
 //api's
 app.get('/', function (req, res) {
-  res.send('api server');
+  res.send('Welcome to Lewiot');
 });
 
 app.use(require('./routes'));
-
-app.get(constants.apis.appData,
-  function (req, res) {
-    AppData.getAll(function (err, appData) {
-      if (err) {
-        throw err;
-      }
-      return res.send(appData);
-    });
-  });
-
-app.get(constants.apis.appData + '/:id',
-  function (req, res) {
-    var uid = req.params.id;
-    AppData.getOne(uid, function (err, appData) {
-      if (err) {
-        throw err;
-      }
-      return res.send(appData);
-    });
-  });
-
-app.put(constants.apis.appData + '/:id',
-  function (req, res) {
-    var updateObject = { uid: req.params.id, TimeStampServer: req.body.timestamp };
-    AppData.updateOne(updateObject, function (err, appData) {
-      if (err) {
-        throw err;
-      }
-      return res.send(appData);
-    });
-  });
-
-app.get('/api/advertisement', //passport.authenticate('jwt', { session: false }),
-  function (req, res) {
-    res.send({ test: "test" });
-  });
-
-app.post(constants.login,
-  function (req, res) {
-    authService.login(req, res);
-  });
-
-app.get(constants.logout, function (req, res) {
-  authService.logout(req, res);
-});
-
-/* Users APIs */
-app.get(constants.apis.users, function (req, res) {
-  Users.getAll(function (err, users) {
-    if (err) {
-      throw err;
-    }
-    return res.send(users);
-  });
-});
-
-app.post('/api/register', //passport.authenticate('jwt', { session: false }),
-  function (req, res) {
-    authService.register(req, res);
-  });
-
-app.delete(constants.apis.users + '/:id', function (req, res) {
-  Users.delete(req.params.id, function (err, user) {
-    if (err) {
-      throw err;
-    }
-    return res.send(user);
-  });
-});
 
 passport.use(new JwtStrategy(jwtOptions, function (jwt_payload, done) {
   // usually this would be a database call:
