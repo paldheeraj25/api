@@ -1,4 +1,5 @@
 var express = require('express');
+var router = express.Router();
 var mongoose = require('mongoose');
 var bodyParser = require('body-parser');
 var constants = require('./consts');
@@ -36,6 +37,7 @@ app.use(express.static('./dist'));
 Products = require(constants.models.products);
 Users = require(constants.models.users);
 Batches = require(constants.models.batches);
+AppData = require(constants.models.apps);
 
 //Connecg to mongoose
 mongoose.connect(constants.db);
@@ -49,13 +51,37 @@ app.get('/', function (req, res) {
   res.send('api server');
 });
 
-app.get(constants.apis.products, //passport.authenticate('jwt', { session: false }),
+app.use(require('./routes'));
+
+app.get(constants.apis.appData,
   function (req, res) {
-    Products.getAll(function (err, products) {
+    AppData.getAll(function (err, appData) {
       if (err) {
         throw err;
       }
-      return res.send(products);
+      return res.send(appData);
+    });
+  });
+
+app.get(constants.apis.appData + '/:id',
+  function (req, res) {
+    var uid = req.params.id;
+    AppData.getOne(uid, function (err, appData) {
+      if (err) {
+        throw err;
+      }
+      return res.send(appData);
+    });
+  });
+
+app.put(constants.apis.appData + '/:id',
+  function (req, res) {
+    var updateObject = { uid: req.params.id, TimeStampServer: req.body.timestamp };
+    AppData.updateOne(updateObject, function (err, appData) {
+      if (err) {
+        throw err;
+      }
+      return res.send(appData);
     });
   });
 
@@ -94,7 +120,7 @@ app.post('/api/upload',
     });
   });
 
-app.get(constants.apis.products + ':id', function (req, res) {
+app.get(constants.apis.products + '/:id', function (req, res) {
   var tagId = req.headers.id;
   return Products.getOne(tagId, function (err, product) {
     if (err) {
@@ -149,5 +175,5 @@ passport.use(new JwtStrategy(jwtOptions, function (jwt_payload, done) {
 }));
 
 
-app.listen(80);
-console.log('Server runnning on port 80');
+app.listen(5012);
+console.log('Server runnning on port 5012');
