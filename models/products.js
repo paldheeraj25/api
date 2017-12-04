@@ -18,6 +18,7 @@ module.exports.getAll = function (callback, limit) {
 };
 
 module.exports.getOne = function (tagid, callback) {
+  console.log(tagid);
   Products.findOne({ tagid: tagid }, callback);
 };
 
