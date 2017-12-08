@@ -33,7 +33,7 @@ app.use(bodyParser.json());
 app.use(passport.initialize());
 
 app.use(express.static('./dist'));
-app.use('/app', express.static('./www'));
+app.use('/lara', express.static('./www'));
 
 //database models
 Products = require(constants.models.products);
@@ -68,4 +68,4 @@ passport.use(new JwtStrategy(jwtOptions, function (jwt_payload, done) {
 
 
 app.listen(80);
-console.log('Server runnning on port 5012');
+console.log('Server runnning on port 80');
