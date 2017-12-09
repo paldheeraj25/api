@@ -17,9 +17,9 @@ module.exports.getAll = function (callback, limit) {
   Products.find(callback).limit(limit);
 };
 
-module.exports.getOne = function (tagid, callback) {
-  console.log(tagid);
-  Products.findOne({ tagid: tagid }, callback);
+module.exports.getOne = function (batchId, callback) {
+  console.log(batchId);
+  Products.findOne({ batchId: batchId }, callback);
 };
 
 module.exports.save = function (product, callback) {
@@ -32,6 +32,17 @@ module.exports.updateOne = function (product, callback) {
     { RowKey: product.uid },
     {
       TimeStampServer: product.TimeStampServer
+    },
+    callback
+  );
+};
+
+module.exports.updateTap = function (product, callback) {
+  console.log(product);
+  Products.update(
+    { batchId: product.batchId },
+    {
+      metadata: product.metadata
     },
     callback
   );

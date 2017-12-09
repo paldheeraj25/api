@@ -1,4 +1,5 @@
 var express = require('express'), router = express.Router();
+const _ = require('lodash');
 
 //get all
 router.get('/api/products', //passport.authenticate('jwt', { session: false }),
@@ -14,12 +15,23 @@ router.get('/api/products', //passport.authenticate('jwt', { session: false }),
 
 //get one
 router.get('/api/products/:id', function (req, res) {
-  var tagId = req.headers.id;
-  return Products.getOne(tagId, function (err, product) {
+  var batchId = req.params.id;
+  return Products.getOne(batchId, function (err, product) {
     if (err) {
       throw err;
     }
-    return res.send(product);
+    _.each(product.metadata, function (meta) {
+      if (meta.name === "tap") {
+        meta.value = parseInt(meta.value) + 1;
+      }
+    });
+    Products.updateTap(product, function (err, productUpdate) {
+      if (err) {
+        throw err;
+      }
+      return res.send(product);
+    });
+    //return res.send(product);
   });
 });
 
