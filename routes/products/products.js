@@ -29,9 +29,9 @@ router.get('/api/products/:id', function (req, res) {
       if (err) {
         throw err;
       }
-      return res.send(product);
+      //return res.send(product);
     });
-    //return res.send(product);
+    return res.send(product);
   });
 });
 
@@ -52,8 +52,26 @@ router.post('/api/upload',//passport.authenticate('jwt', { session: false }),
         { name: "manufacture", value: batchData.manufacture, show: true },
         { name: "expire", value: batchData.expire, show: true },
         { name: "country", value: batchData.country, show: true },
-        { name: "city", value: batchData.city, show: true }
-      ]
+        { name: "city", value: batchData.city, show: true },
+        { name: "tap", value: "0", show: true },
+        { name: "sold", value: "0", show: true }
+      ],
+      engagement: {
+        PartitionKey: 'Lewiot',
+        RowKey: batchId,
+        Timestamp: "2016-11-10 09:25:25",
+        CountRollingCodeError: 24,
+        CountRollingCodeOK: 4,
+        CountTimeStampError: 9,
+        LastCountRollingCodeError: "2017-11-20 06:29:35",
+        LastCountRollingCodeOK: "2017-11-23 10:37:56",
+        LastCountTimeStampError: "2017-11-23 10:38:07",
+        RollingCodeServer: "613C6CD4",
+        SecretKey: "FFFFFF" + batchId,
+        TamperFlag: "00",
+        TamperStatusOpened: "false",
+        TimeStampServer: -1
+      }
     };
     Batches.save({ batchId: batchId, tagId: batchTagids }, function (err, batch) {
       if (err)

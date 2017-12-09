@@ -8,7 +8,23 @@ var productSchema = mongoose.Schema({
     type: String,
     required: true
   },
-  metadata: [{ name: String, value: String, show: Boolean }]
+  metadata: [{ name: String, value: String, show: Boolean }],
+  engagement: {
+    PartitionKey: String,
+    RowKey: String,
+    Timestamp: String,
+    CountRollingCodeError: Number,
+    CountRollingCodeOK: Number,
+    CountTimeStampError: Number,
+    LastCountRollingCodeError: String,
+    LastCountRollingCodeOK: String,
+    LastCountTimeStampError: String,
+    RollingCodeServer: String,
+    SecretKey: String,
+    TamperFlag: String,
+    TamperStatusOpened: String,
+    TimeStampServer: String
+  }
 });
 
 var Products = module.exports = mongoose.model('Products', productSchema);
@@ -38,7 +54,6 @@ module.exports.updateOne = function (product, callback) {
 };
 
 module.exports.updateTap = function (product, callback) {
-  console.log(product);
   Products.update(
     { batchId: product.batchId },
     {
