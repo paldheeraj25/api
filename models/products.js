@@ -23,7 +23,7 @@ var productSchema = mongoose.Schema({
     SecretKey: String,
     TamperFlag: String,
     TamperStatusOpened: String,
-    TimeStampServer: String
+    TimeStampServer: Number
   }
 });
 
