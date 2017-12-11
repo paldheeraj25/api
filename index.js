@@ -13,6 +13,8 @@ var passportJWT = require("passport-jwt");
 var util = require('util');
 const csvparse = require('js-csvparser');
 const _ = require('lodash');
+const path = require('path');
+const multer = require('multer');
 var bcrypt = require('bcryptjs');
 const saltRounds = 10;
 
@@ -32,8 +34,10 @@ app.use(bodyParser.json());
 //app.use(expressValidator());
 app.use(passport.initialize());
 
+
+
+app.use('/public', express.static('./public'));
 app.use('/', express.static('./dist'));
-app.use('/lara', express.static('./www'));
 
 //database models
 Products = require(constants.models.products);
@@ -66,6 +70,5 @@ passport.use(new JwtStrategy(jwtOptions, function (jwt_payload, done) {
   });
 }));
 
-
-app.listen(80);
+app.listen(5012);
 console.log('Server runnning on port 5012');

@@ -1,6 +1,32 @@
+/*jshint esversion: 6 */
 var express = require('express'), router = express.Router();
 const _ = require('lodash');
+const path = require('path');
+const multer = require('multer');
 
+//Set storage engine
+const storage = multer.diskStorage({
+  destination: './public/uploads',
+  filename: function (req, file, cb) {
+    cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+  }
+});
+
+//Init uplaod var
+const upload = multer({
+  storage: storage
+}).single('file');
+
+app.post('/api/uploadImage', function (req, res) {
+  upload(req, res, function (err) {
+    //console.log(req.file);
+    if (err) {
+      res.json({ error_code: 1, err_desc: err });
+      return;
+    }
+    res.send(req.file);
+  });
+});
 //get all
 router.get('/api/products', //passport.authenticate('jwt', { session: false }),
   function (req, res) {
@@ -29,7 +55,7 @@ router.get('/api/products/:id', function (req, res) {
       if (err) {
         throw err;
       }
-      //return res.send(product);
+      return res.send(product);
     });
     return res.send(product);
   });
@@ -42,6 +68,7 @@ router.post('/api/upload',//passport.authenticate('jwt', { session: false }),
     var batchData = req.body.metadata;
     var batchId = req.body.metadata.batchId;
     var batchTagids = req.body.idList;
+
     var productDetails = {
       batchId: batchId,
       name: batchData.name,
@@ -54,7 +81,15 @@ router.post('/api/upload',//passport.authenticate('jwt', { session: false }),
         { name: "country", value: batchData.country, show: true },
         { name: "city", value: batchData.city, show: true },
         { name: "tap", value: "0", show: true },
-        { name: "sold", value: "0", show: true }
+        { name: "sold", value: "0", show: true },
+        { name: "manOrMachine", value: batchData.manOrMachine, show: true },
+        { name: "goldCarat", value: batchData.goldCarat, show: true },
+        { name: "percentChrg", value: batchData.percentChrg, show: true },
+        { name: "grossWeight", value: batchData.grossWeight, show: true },
+        { name: "netWeight", value: batchData.netWeight, show: true },
+        { name: "stoneWeight", value: batchData.stoneWeight, show: true },
+        { name: "beadsWeight", value: batchData.beadsWeight, show: true },
+        { name: "perGramWeight", value: batchData.perGramWeight, show: true }
       ],
       engagement: {
         PartitionKey: 'Lewiot',
@@ -83,6 +118,8 @@ router.post('/api/upload',//passport.authenticate('jwt', { session: false }),
       });
     });
   });
+
+
 
 module.exports = router;
 
