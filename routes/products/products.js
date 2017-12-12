@@ -55,7 +55,6 @@ router.get('/api/products/:id', function (req, res) {
       if (err) {
         throw err;
       }
-      return res.send(product);
     });
     return res.send(product);
   });
