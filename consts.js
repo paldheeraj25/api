@@ -8,6 +8,7 @@ models.products = models.base + "/products";
 models.users = models.base + "/users";
 models.batches = models.base + "/batches";
 models.apps = models.base + "/apps";
+models.jewel = models.base + "/jewel";
 
 
 //RestFul APIs
@@ -20,6 +21,9 @@ apis.products = apis.base + "/products";
 apis.users = apis.base + "/users";
 apis.batches = apis.base + "/batches";
 apis.appData = apis.base + "/appData";
+
+//for jewel
+apis.jewel = apis.base + "/jewel";
 
 module.exports = {
   db: db,

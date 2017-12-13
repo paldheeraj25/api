@@ -44,6 +44,7 @@ Products = require(constants.models.products);
 Users = require(constants.models.users);
 Batches = require(constants.models.batches);
 AppData = require(constants.models.apps);
+Jewels = require(constants.models.jewel);
 
 //Connecg to mongoose
 mongoose.connect(constants.db);
