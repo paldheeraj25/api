@@ -21,7 +21,7 @@ var productSchema = mongoose.Schema({
 });
 
 var Jewel = module.exports = mongoose.model('Jewels', productSchema);
-//get Jewel
+//get Jewels
 module.exports.getAll = function (callback, limit) {
   Jewel.find(callback).limit(limit);
 };
@@ -54,6 +54,14 @@ module.exports.updateOne = function (jewel, callback) {
       perGramWeight: jewel.perGramWeight,
       image: jewel.image,
     },
+    callback
+  );
+};
+
+module.exports.updateTap = function (jewel, callback) {
+  Jewel.update(
+    { code: jewel.code },
+    { tap: jewel.tap + 1 },
     callback
   );
 };

@@ -28,13 +28,13 @@ app.post('/api/uploadImage', function (req, res) {
   });
 });
 //get all
-router.get('/api/products', //passport.authenticate('jwt', { session: false }),
+router.get('/api/jewel', //passport.authenticate('jwt', { session: false }),
   function (req, res) {
-    Products.getAll(function (err, products) {
+    Jewels.getAll(function (err, jewels) {
       if (err) {
         throw err;
       }
-      return res.send(products);
+      return res.send(jewels);
     });
   });
 
@@ -73,7 +73,23 @@ router.post('/api/jewel',//passport.authenticate('jwt', { session: false }),
     });
   });
 
-
+//get and updateTap
+router.get('/api/jewel/get/update/:id', function (req, res) {
+  var code = req.params.id;
+  return res.send(code);
+  // return Jewels.getOne(code, function (err, jewel) {
+  //   if (err) {
+  //     throw err;
+  //   }
+  //   Jewel.updateTap(jewel, function (err, jewel) {
+  //     if (err) {
+  //       throw err;
+  //     }
+  //     return true;
+  //   });
+  //   return res.send(jewel);
+  // });
+});
 
 module.exports = router;
 
