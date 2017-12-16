@@ -1,3 +1,8 @@
 /node_modules
 public
 www
+.DS_Store
+mongodb-osx-ssl-x86_64-3.4.9.tgz
+mongodb/
+.gitignore
+error-logs.js
