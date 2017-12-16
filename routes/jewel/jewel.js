@@ -4,6 +4,13 @@ const _ = require('lodash');
 const path = require('path');
 const multer = require('multer');
 
+//sms api initialization
+const Nexmo = require('nexmo');
+const nexmo = new Nexmo({
+  apiKey: 'd930eae1',
+  apiSecret: '4691606a0b4360a2'
+});
+
 //Set storage engine
 const storage = multer.diskStorage({
   destination: './public/uploads',
@@ -89,6 +96,21 @@ router.get('/api/jewel/get/update/:id', function (req, res) {
     return res.send(jewel);
   });
 });
+
+//share jewel
+router.post('/api/jewel/share', function (req, res) {
+  var message = req.body;
+  nexmo.message.sendSms(
+    'NEXMO', '91' + message.number, message.jewel, { type: 'unicode' }, (err, responseData) => {
+      if (err) {
+        throw err;
+      } else {
+        res.send(responseData);
+      }
+    }
+  );
+});
+
 
 module.exports = router;
 
