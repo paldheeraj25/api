@@ -46,8 +46,9 @@ Users = require(constants.models.users);
 Batches = require(constants.models.batches);
 AppData = require(constants.models.apps);
 Jewels = require(constants.models.jewel);
+jeweldesign = require(constants.models.jeweldesign);
 
-//Connecg to mongoose
+//Connect to mongoose
 mongoose.connect(constants.db);
 var db = mongoose.connect;
 const cors = require('cors');
