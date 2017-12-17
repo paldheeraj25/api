@@ -11,8 +11,8 @@ const nexmo = new Nexmo({
   apiSecret: '4691606a0b4360a2'
 });
 // Twilio Credentials 
-var accountSid = 'ACe3605c1a18c2c187f147efe8e1382f37';
-var authToken = 'b7d7850a99f0f83bfd4de4269229c91b';
+var accountSid = '';
+var authToken = '';
 
 //require the Twilio module and create a REST client 
 var client = require('twilio')(accountSid, authToken);
