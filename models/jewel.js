@@ -65,3 +65,11 @@ module.exports.updateTap = function (jewel, callback) {
     callback
   );
 };
+
+module.exports.updateSoldCount = function (jewel, callback) {
+  Jewel.update(
+    { code: jewel.code },
+    { sold: jewel.sold + 1 },
+    callback
+  );
+};

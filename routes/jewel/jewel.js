@@ -11,8 +11,8 @@ const nexmo = new Nexmo({
   apiSecret: '4691606a0b4360a2'
 });
 // Twilio Credentials 
-var accountSid = '';
-var authToken = '';
+var accountSid = 'ACe3605c1a18c2c187f147efe8e1382f37';
+var authToken = 'b7d7850a99f0f83bfd4de4269229c91b';
 
 //require the Twilio module and create a REST client 
 var client = require('twilio')(accountSid, authToken);
@@ -93,12 +93,14 @@ router.get('/api/jewel/get/update/:id', function (req, res) {
     if (err) {
       throw err;
     }
-    Jewels.updateTap(jewel, function (err, jewel) {
-      if (err) {
-        throw err;
-      }
-      return true;
-    });
+    if (jewel) {
+      Jewels.updateTap(jewel, function (err, jewel) {
+        if (err) {
+          throw err;
+        }
+        return true;
+      });
+    }
     return res.send(jewel);
   });
 });
@@ -118,15 +120,18 @@ router.post('/api/jewel/share', function (req, res) {
     console.log(message.sid);
     res.send(message.sid);
   });
-  // nexmo.message.sendSms(
-  //   'NEXMO', '91' + message.number, message.jewel, { type: 'unicode' }, (err, responseData) => {
-  //     if (err) {
-  //       throw err;
-  //     } else {
-  //       res.send(responseData);
-  //     }
-  //   }
-  // );
+});
+
+//sold count 
+router.post('/api/jewel/sold', function (req, res) {
+  var soldDetails = req.body;
+  return Jewels.updateSoldCount(soldDetails, function (err, soldCount) {
+    if (err) {
+      throw err;
+    }
+    return res.send(soldCount);
+  });
+
 });
 
 
