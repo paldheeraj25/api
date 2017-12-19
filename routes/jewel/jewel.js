@@ -110,16 +110,20 @@ router.post('/api/jewel/share', function (req, res) {
 
   var message = req.body;
 
-  client.messages.create({
-    to: "+91" + message.number,
-    from: "+18029921408",
-    body: message.jewel,
-  }, function (err, message) {
-    if (err)
-      res.send(err);
-    console.log(message.sid);
-    res.send(message.sid);
-  });
+  if (message.number) {
+    client.messages.create({
+      to: "+91" + message.number,
+      from: "+18029921408",
+      body: message.jewel,
+    }, function (err, message) {
+      if (err)
+        res.send(err);
+      console.log(message.sid);
+      res.send(message.sid);
+    });
+  } else {
+    res.send('please provide a valid number');
+  }
 });
 
 //sold count 
