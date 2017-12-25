@@ -28,7 +28,12 @@ module.exports.getAll = function (callback, limit) {
 
 //get one
 module.exports.getByDate = function (date, callback) {
-  Grocery.find({ date: date }, callback);
+  Grocery.find({
+    $and: [
+      { 'date': date },
+      { 'delivered': false }
+    ]
+  }, callback);
 };
 
 //save grocery
@@ -36,4 +41,15 @@ module.exports.save = function (grocery, callback) {
   var Grocery = new Groceries(grocery);
   Grocery.save(callback);
 };
+
+//grocery delivered 
+module.exports.updateDelivery = function (id, callback) {
+  console.log('in update delivery');
+  Grocery.update(
+    { _id: id },
+    { $set: { delivered: true } },
+    callback
+  );
+};
+
 

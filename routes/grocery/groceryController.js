@@ -38,7 +38,17 @@ router.get('/api/grocery/:date', function (req, res) {
   });
 });
 
-//get for date
+//update delivery
+router.get('/api/grocery/delivered/:id', function (req, res) {
+  var id = req.params.id;
+  console.log(id);
+  Groceries.updateDelivery(id, function (err, grocery) {
+    if (err)
+      throw (err);
+    res.send(grocery);
+  });
+});
+
 
 
 
