@@ -17,6 +17,9 @@ app.use(require('./appdata/appdata'));
 //ad rout
 app.use(require('./advertisements/advertisements'));
 
+//grocery rout
+app.use(require('./grocery/groceryController'));
+
 //auth rout
 app.use(require('./auth/auth'));
 

@@ -11,6 +11,7 @@ models.apps = models.base + "/apps";
 models.jewel = models.base + "/jewel";
 models.advertisement = models.base + "/advertisement";
 models.jeweldesign = models.base + "/jeweldesign";
+models.grocery = models.base + "/groceryModel";
 
 
 //RestFul APIs
