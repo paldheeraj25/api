@@ -12,6 +12,40 @@ app.post('/api/grocery', function (req, res) {
     if (err) {
       throw err;
     }
+
+    //oneSignal Test
+    var request = require('request');
+    var sendMessage = function (device, message) {
+      var restKey = '';
+      var appID = '';
+      request(
+        {
+          method: 'POST',
+          uri: 'https://onesignal.com/api/v1/notifications',
+          headers: {
+            "authorization": "Basic " + restKey,
+            "content-type": "application/json"
+          },
+          json: true,
+          body: {
+            'app_id': appID,
+            'headings': { "en": "Lara" },
+            'contents': { en: message },
+            'include_player_ids': Array.isArray(device) ? device : [device]
+          }
+        },
+        function (error, response, body) {
+          if (!body.errors) {
+            console.log(body);
+          } else {
+            console.error('Error:', body.errors);
+          }
+
+        }
+      );
+    };
+    sendMessage(['8c6ba97d-74dc-49a6-a8e7-56fc5e0ad64d', '2ae7dd0e-160d-4b21-9ab9-01ff84bba938'], 'Order recieved!');
+
     return res.send(grocery);
   });
 });
@@ -29,6 +63,7 @@ app.get('/api/grocery', function (req, res) {
 
 //get by date
 router.get('/api/grocery/:date', function (req, res) {
+
   var dateString = req.params.date;
   Groceries.getByDate(dateString, function (err, grocery) {
     if (err) {
