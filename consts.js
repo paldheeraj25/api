@@ -9,7 +9,7 @@ models.users = models.base + "/users";
 models.batches = models.base + "/batches";
 models.apps = models.base + "/apps";
 models.jewel = models.base + "/jewel";
-models.advertisement = models.base + "/advertisement";
+models.advertisement = models.base + "/Advertisement";
 models.jeweldesign = models.base + "/jeweldesign";
 models.grocery = models.base + "/groceryModel";
 
