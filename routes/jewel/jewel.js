@@ -4,6 +4,12 @@ const _ = require('lodash');
 const path = require('path');
 const multer = require('multer');
 
+var passport = require("passport");
+var passportJWT = require("passport-jwt");
+
+var ExtractJwt = passportJWT.ExtractJwt;
+var JwtStrategy = passportJWT.Strategy;
+
 //sms api initialization
 const Nexmo = require('nexmo');
 const nexmo = new Nexmo({
@@ -41,7 +47,7 @@ app.post('/api/uploadImage', function (req, res) {
   });
 });
 //get all
-router.get('/api/jewel', //passport.authenticate('jwt', { session: false }),
+router.get('/api/jewel', passport.authenticate('jwt', { session: false }),
   function (req, res) {
     Jewels.getAll(function (err, jewels) {
       if (err) {

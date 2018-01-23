@@ -4,6 +4,12 @@ const _ = require('lodash');
 const path = require('path');
 const multer = require('multer');
 
+var passport = require("passport");
+var passportJWT = require("passport-jwt");
+
+var ExtractJwt = passportJWT.ExtractJwt;
+var JwtStrategy = passportJWT.Strategy;
+
 //Set storage engine
 const storage = multer.diskStorage({
   destination: './public/uploads',
@@ -28,7 +34,7 @@ app.post('/api/uploadImage', function (req, res) {
   });
 });
 //get all
-router.get('/api/products', //passport.authenticate('jwt', { session: false }),
+router.get('/api/products', passport.authenticate('jwt', { session: false }),
   function (req, res) {
     Products.getAll(function (err, products) {
       if (err) {
