@@ -1,26 +1,32 @@
+// Author : Lewiot
+// Created : Sep 2017
+// Index.js : This is a index file mainly used for routing all APIs to their respective js files
 
 var express = require('express'), router = express.Router();
 
-//product rout
+//users route
+app.use(require('./users/users'));
+
+//product route
 app.use(require('./products/products'));
 
-//jewel rout
+//jewel route
 app.use(require('./jewel/jewel'));
 
-//Design rout
+//Design route
 var jeweldesign = require('./jeweldesign/jeweldesign');
 app.use(jeweldesign);
 
 //app data
 app.use(require('./appdata/appdata'));
 
-//ad rout
+//ad route
 app.use(require('./advertisements/advertisements'));
 
-//grocery rout
+//grocery route
 app.use(require('./grocery/groceryController'));
 
-//auth rout
+//auth route
 app.use(require('./auth/auth'));
 
 module.exports = router;

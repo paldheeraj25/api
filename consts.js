@@ -1,3 +1,7 @@
+// Author : Lewiot
+// Created : Sep 2017
+// This file is used for defining all the constant routes for service calls and db querying
+
 //DB connection
 var db = "mongodb://localhost/lewiot";
 

@@ -1,3 +1,7 @@
+// Author : Lewiot
+// Created : Sep 2017
+// Index.js : This is a index file mainly used for defining passport modules and mediator to UI calls, router index.js file
+
 /*jshint esversion: 6 */
 var express = require('express');
 var router = express.Router();

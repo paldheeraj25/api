@@ -1,3 +1,7 @@
+// Author : Lewiot
+// Created : Sep 2017
+// This file acts as API creator for jewels list and to fetch data from mongo db
+
 /*jshint esversion: 6 */
 var express = require('express'), router = express.Router();
 const _ = require('lodash');
