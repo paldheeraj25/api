@@ -20,7 +20,7 @@ router.get('/api/users', passport.authenticate('jwt', { session: false }), funct
   });
 });
 
-router.delete('/api/users' + '/:id', function (req, res) {
+router.delete('/api/users' + '/:id', passport.authenticate('jwt', { session: false }), function (req, res) {
   Users.delete(req.params.id, function (err, user) {
     if (err) {
       throw err;

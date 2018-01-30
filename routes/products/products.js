@@ -50,7 +50,7 @@ router.get('/api/products', passport.authenticate('jwt', { session: false }),
 
 
 //get one
-router.get('/api/products/:id', function (req, res) {
+router.get('/api/products/:id', passport.authenticate('jwt', { session: false }), function (req, res) {
   var batchId = req.params.id;
   return Products.getOne(batchId, function (err, product) {
     if (err) {
@@ -71,7 +71,7 @@ router.get('/api/products/:id', function (req, res) {
 });
 
 //upload product check: check for passport authentication via making const passport global or use here
-router.post('/api/upload',//passport.authenticate('jwt', { session: false }),
+router.post('/api/upload', passport.authenticate('jwt', { session: false }),
   function (req, res) {
 
     var batchData = req.body.metadata;
@@ -117,7 +117,7 @@ router.post('/api/upload',//passport.authenticate('jwt', { session: false }),
         TimeStampServer: -1
       }
     };
-    Batches.save({ batchId: batchId, tagId: batchTagids }, function (err, batch) {
+    Batches.save({ batchId: batchId, tagId: batchTagids }, passport.authenticate('jwt', { session: false }), function (err, batch) {
       if (err)
         return err;
       Products.save(productDetails, function (err, product) {
@@ -127,8 +127,6 @@ router.post('/api/upload',//passport.authenticate('jwt', { session: false }),
       });
     });
   });
-
-
 
 module.exports = router;
 
