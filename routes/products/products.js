@@ -1,8 +1,18 @@
+// Author : Lewiot
+// Created : Sep 2017
+// This file acts as API creator for products management and to fetch data from mongo db
+
 /*jshint esversion: 6 */
 var express = require('express'), router = express.Router();
 const _ = require('lodash');
 const path = require('path');
 const multer = require('multer');
+
+var passport = require("passport");
+var passportJWT = require("passport-jwt");
+
+var ExtractJwt = passportJWT.ExtractJwt;
+var JwtStrategy = passportJWT.Strategy;
 
 //Set storage engine
 const storage = multer.diskStorage({
@@ -28,7 +38,7 @@ app.post('/api/uploadImage', function (req, res) {
   });
 });
 //get all
-router.get('/api/products', //passport.authenticate('jwt', { session: false }),
+router.get('/api/products', passport.authenticate('jwt', { session: false }),
   function (req, res) {
     Products.getAll(function (err, products) {
       if (err) {
@@ -40,7 +50,7 @@ router.get('/api/products', //passport.authenticate('jwt', { session: false }),
 
 
 //get one
-router.get('/api/products/:id', function (req, res) {
+router.get('/api/products/:id', passport.authenticate('jwt', { session: false }), function (req, res) {
   var batchId = req.params.id;
   return Products.getOne(batchId, function (err, product) {
     if (err) {
@@ -61,7 +71,7 @@ router.get('/api/products/:id', function (req, res) {
 });
 
 //upload product check: check for passport authentication via making const passport global or use here
-router.post('/api/upload',//passport.authenticate('jwt', { session: false }),
+router.post('/api/upload', passport.authenticate('jwt', { session: false }),
   function (req, res) {
 
     var batchData = req.body.metadata;
@@ -107,7 +117,7 @@ router.post('/api/upload',//passport.authenticate('jwt', { session: false }),
         TimeStampServer: -1
       }
     };
-    Batches.save({ batchId: batchId, tagId: batchTagids }, function (err, batch) {
+    Batches.save({ batchId: batchId, tagId: batchTagids }, passport.authenticate('jwt', { session: false }), function (err, batch) {
       if (err)
         return err;
       Products.save(productDetails, function (err, product) {
@@ -117,8 +127,6 @@ router.post('/api/upload',//passport.authenticate('jwt', { session: false }),
       });
     });
   });
-
-
 
 module.exports = router;
 

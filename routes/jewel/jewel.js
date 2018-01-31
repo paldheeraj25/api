@@ -1,8 +1,18 @@
+// Author : Lewiot
+// Created : Sep 2017
+// This file acts as API creator for jewels list and to fetch data from mongo db
+
 /*jshint esversion: 6 */
 var express = require('express'), router = express.Router();
 const _ = require('lodash');
 const path = require('path');
 const multer = require('multer');
+
+var passport = require("passport");
+var passportJWT = require("passport-jwt");
+
+var ExtractJwt = passportJWT.ExtractJwt;
+var JwtStrategy = passportJWT.Strategy;
 
 //sms api initialization
 const Nexmo = require('nexmo');
@@ -41,7 +51,7 @@ app.post('/api/uploadImage', function (req, res) {
   });
 });
 //get all
-router.get('/api/jewel', //passport.authenticate('jwt', { session: false }),
+router.get('/api/jewel', passport.authenticate('jwt', { session: false }),
   function (req, res) {
     Jewels.getAll(function (err, jewels) {
       if (err) {
