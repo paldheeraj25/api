@@ -53,6 +53,17 @@ router.get('/api/jewel', //passport.authenticate('jwt', { session: false }),
     });
   });
 
+router.get('/api/jewel/summary', //passport.authenticate('jwt', { session: false }),
+  function (req, res) {
+    Jewels.getSummary(function (err, jewelsCount) {
+      if (err) {
+        throw err;
+      }
+      return res.send({ count: jewelsCount });
+    });
+  }
+)
+
 
 //get one
 router.get('/api/jewel/:id', function (req, res) {
