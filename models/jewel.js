@@ -22,8 +22,14 @@ var productSchema = mongoose.Schema({
 
 var Jewel = module.exports = mongoose.model('Jewels', productSchema);
 //get Jewels
-module.exports.getAll = function (callback, limit) {
-  Jewel.find(callback).limit(limit);
+module.exports.getAll = function (offset, limit, callback) {
+  console.log(offset);
+  console.log(limit);
+  if (offset !== undefined && limit !== undefined) {
+    Jewel.find(callback).skip(offset).limit(limit);
+  } else {
+    Jewel.find(callback).limit(limit);
+  }
 };
 
 //get jewel by id

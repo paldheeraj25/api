@@ -43,7 +43,9 @@ app.post('/api/uploadImage', function (req, res) {
 //get all
 router.get('/api/jewel', //passport.authenticate('jwt', { session: false }),
   function (req, res) {
-    Jewels.getAll(function (err, jewels) {
+    const offset = Number(req.query.offset);
+    const limit = Number(req.query.limit);
+    Jewels.getAll(offset, limit, function (err, jewels) {
       if (err) {
         throw err;
       }
