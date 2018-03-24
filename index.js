@@ -53,6 +53,7 @@ Jewels = require(constants.models.jewel);
 Advertisement = require(constants.models.advertisement);
 jeweldesign = require(constants.models.jeweldesign);
 Groceries = require(constants.models.grocery);
+Cryptoipl = require(constants.models.cryptoipl);
 
 //Connect to mongoose
 mongoose.connect(constants.db);

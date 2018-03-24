@@ -7,6 +7,9 @@ var express = require('express'), router = express.Router();
 //users route
 app.use(require('./users/users'));
 
+// crypto ipl
+app.use(require('./cryptoipl/cryptoipl'));
+
 //product route
 app.use(require('./products/products'));
 

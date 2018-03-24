@@ -16,6 +16,7 @@ models.jewel = models.base + "/jewel";
 models.advertisement = models.base + "/Advertisement";
 models.jeweldesign = models.base + "/jeweldesign";
 models.grocery = models.base + "/groceryModel";
+models.cryptoipl = models.base + "/cryptoipl";
 
 
 //RestFul APIs
@@ -28,6 +29,7 @@ apis.products = apis.base + "/products";
 apis.users = apis.base + "/users";
 apis.batches = apis.base + "/batches";
 apis.appData = apis.base + "/appData";
+apis.cryptoipl = apis.base + "/cryptoipl";
 
 //for jewel
 apis.jewel = apis.base + "/jewel";
