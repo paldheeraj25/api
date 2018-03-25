@@ -45,58 +45,74 @@ router.post('/api/cryptoipl/:id/updateinfo', function( req, res ) {
   });
 });
 
+mailSender = function(to, msg) {
+  let transporter = nodemailer.createTransport({
+    service: 'gmail',
+    port: 25,
+    secure: false,
+    auth: {
+        user: "idofmalothnaresh@gmail.com",
+        pass: "kishan028"
+    },
+    tls: {
+      rejectUnauthorized: false
+    }
+  });
+  
+  let mailOptions = {
+      from: '"Maloth Naresh" <idofmalothnaresh@gmail.com>',
+      to: to,
+      subject: 'Crypto IPL notice',
+      text: msg
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+        return error;
+    }
+    console.log('Message sent!');
+    console.log('Info: ', info);
+  });
+}
+
 router.post('/api/cryptoipl/sendmail', function( req, res) {
-  console.log(req.body);
   const obj = req.body;
-  for( var i=0; i < 2; i++) {
-    wallet = i == 0 ? obj.oldOwner : obj.newOwner;
-    Cryptoipl.getOne("0x584e20986ac344adeb007ecc9d901c31db154624", function (err, cryptoipl) {
+    wallet = obj.oldOwner
+    Cryptoipl.getOne(wallet, function (err, cryptoipl) {
       if (err) {
         throw err;
       }
       if( !cryptoipl ) {
         return 
       }
-      console.log("response : ", cryptoipl);
-      let transporter = nodemailer.createTransport({
-        service: 'gmail',
-        port: 25,
-        secure: false,
-        auth: {
-            user: "idofmalothnaresh@gmail.com",
-            pass: "kishan028"
-        },
-        tls: {
-          rejectUnauthorized: false
-        }
-      });
 
+      // Old owner mail
       var fromMsg = "Congratulations from Crypto IPL Team. Your team " + 
         obj.name + " has been successfully sold for price " + obj.oldPrice;
-      var toMsg = "Congratulations from Crypto IPL Team. You successfully have aquired new team " + obj.name + " for price " + obj.oldPrice + 
-      ". You would get new price " + obj.newPrice + " if someone owns it.";
-
-      var message = i == 0 ? fromMsg : toMsg;
-      console.log("i value: ",i);
-
-      console.log("message: ", message);
-
-      let mailOptions = {
-          from: '"Maloth Naresh" <idofmalothnaresh@gmail.com>',
-          to: cryptoipl.email,
-          subject: 'Crypto IPL notice',
-          text: message
-      };
-
-      transporter.sendMail(mailOptions, (error, info) => {
-          if (error) {
-              return console.log(error);
-          }
-          console.log('Message sent!');
-          console.log('Info: ', info);
-      });
+      mailSender(cryptoipl.email, fromMsg);
+      
     });
-  }
+    
+    // New owner mail
+    wallet = obj.newOwner
+    Cryptoipl.getOne(wallet, function (err, cryptoipl) {
+      if (err) {
+        throw err;
+      }
+      if( !cryptoipl ) {
+        return 
+      }
+
+      var toMsg = "Congratulations from Crypto IPL Team. You successfully have aquired new team " + obj.name + " for price " + obj.oldPrice + 
+        ". You would get new price " + obj.newPrice + " if someone aquires it.";
+      mailSender(cryptoipl.email, toMsg);
+      
+    });
+
+    return res.json({
+      success: true,
+      status: 'Successfully Registered User, Check Email To Activate'
+    });
 
 });
 
