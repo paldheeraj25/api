@@ -88,7 +88,8 @@ router.post('/api/cryptoipl/sendmail', function( req, res) {
 
       // Old owner mail
       var fromMsg = "Congratulations from Crypto IPL Team. Your team " + 
-        obj.name + " has been successfully sold for price " + obj.oldPrice;
+        obj.name + " selling transaction has been successfully initiated for price " + obj.oldPrice + 
+        ". And it could take several minutes to complete the transaction on blockchain. Thank you.";
       mailSender(cryptoipl.email, fromMsg);
       
     });
@@ -103,8 +104,8 @@ router.post('/api/cryptoipl/sendmail', function( req, res) {
         return 
       }
 
-      var toMsg = "Congratulations from Crypto IPL Team. You successfully have aquired new team " + obj.name + " for price " + obj.oldPrice + 
-        ". You would get new price " + obj.newPrice + " if someone aquires it.";
+      var toMsg = "Congratulations from Crypto IPL Team. Your transaction has been successfully initiated on blockchain to aquire new team " + obj.name + " for price " + obj.oldPrice + 
+        ". It would take several minutes to complete your transaction. Thank you. ";
       mailSender(cryptoipl.email, toMsg);
       
     });
