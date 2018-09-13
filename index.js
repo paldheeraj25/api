@@ -54,6 +54,7 @@ Advertisement = require(constants.models.advertisement);
 jeweldesign = require(constants.models.jeweldesign);
 Groceries = require(constants.models.grocery);
 Cryptoipl = require(constants.models.cryptoipl);
+Students = require(constants.models.students);
 
 //Connect to mongoose
 mongoose.connect(constants.db);
@@ -80,5 +81,5 @@ passport.use(new JwtStrategy(jwtOptions, function (jwt_payload, done) {
   });
 }));
 
-app.listen(5012);
+app.listen(80);
 console.log('Server runnning on port 5012');

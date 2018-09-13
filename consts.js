@@ -17,6 +17,7 @@ models.advertisement = models.base + "/Advertisement";
 models.jeweldesign = models.base + "/jeweldesign";
 models.grocery = models.base + "/groceryModel";
 models.cryptoipl = models.base + "/cryptoipl";
+models.students = models.base + "/students";
 
 
 //RestFul APIs
@@ -30,6 +31,7 @@ apis.users = apis.base + "/users";
 apis.batches = apis.base + "/batches";
 apis.appData = apis.base + "/appData";
 apis.cryptoipl = apis.base + "/cryptoipl";
+apis.students = apis.base + "/students";
 
 //for jewel
 apis.jewel = apis.base + "/jewel";

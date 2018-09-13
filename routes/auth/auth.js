@@ -3,7 +3,6 @@ var authService = require('../../authService');
 
 router.post('/api/login',
   function (req, res) {
-    console.log("in login function");
     authService.login(req, res);
   });
 

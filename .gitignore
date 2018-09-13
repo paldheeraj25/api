@@ -6,3 +6,4 @@ mongodb-osx-ssl-x86_64-3.4.9.tgz
 mongodb/
 .gitignore
 error-logs.js
+.vscode/

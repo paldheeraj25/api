@@ -32,4 +32,11 @@ app.use(require('./grocery/groceryController'));
 //auth route
 app.use(require('./auth/auth'));
 
+//students route
+app.use(require('./students/students'));
+
+//students route
+app.use(require('./college/colleges'));
+
+
 module.exports = router;
