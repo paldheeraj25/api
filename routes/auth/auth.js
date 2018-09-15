@@ -15,5 +15,9 @@ router.post('/api/register', //passport.authenticate('jwt', { session: false }),
     authService.register(req, res);
   });
 
+router.post('/api/linkedin',
+  function (req, res) {
+    authService.thirdParty(req, res);
+  });
 
 module.exports = router;

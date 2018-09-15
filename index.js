@@ -81,5 +81,5 @@ passport.use(new JwtStrategy(jwtOptions, function (jwt_payload, done) {
   });
 }));
 
-app.listen(80);
+app.listen(5012);
 console.log('Server runnning on port 5012');

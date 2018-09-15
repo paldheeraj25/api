@@ -1,16 +1,12 @@
 var constants = require('./consts');
 var session = require('express-session');
 var jwt = require('jsonwebtoken');
-var passport = require('passport');
 var passportJWT = require("passport-jwt");
-var util = require('util');
-const csvparse = require('js-csvparser');
 const _ = require('lodash');
 var bcrypt = require('bcryptjs');
 const saltRounds = 10;
 
 var ExtractJwt = passportJWT.ExtractJwt;
-var JwtStrategy = passportJWT.Strategy;
 
 var jwtOptions = {};
 jwtOptions.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
@@ -18,7 +14,7 @@ jwtOptions.secretOrKey = 'secret';
 
 Users = require(constants.models.users);
 
-module.exports.login = function(req, res) {
+module.exports.login = function (req, res) {
   var email = req.body.email;
   var password = req.body.password;
   Users.findOne({ email: email }, function (err, user) {
@@ -39,12 +35,23 @@ module.exports.login = function(req, res) {
   });
 }
 
-module.exports.logout = function(req, res) {
+module.exports.thirdParty = function (req, res) {
+  var userId = req.body.id;
+  if (userId) {
+    var payload = { id: userId };
+    var token = jwt.sign(payload, jwtOptions.secretOrKey);
+    return res.send({ message: "ok", token: token });
+  } else {
+    return res.status(401).json({ message: "no such user found" });
+  }
+}
+
+module.exports.logout = function (req, res) {
   req.logout();
   res.send({ success: 'logout successfull' });
 }
 
-module.exports.register = function(req, res) {
+module.exports.register = function (req, res) {
   var user = {
     username: req.body.username,
     email: req.body.email,
@@ -53,12 +60,12 @@ module.exports.register = function(req, res) {
     active: req.body.active
   };
   bcrypt.hash(user.password, saltRounds, function (err, hash) {
-      user.password = hash;
-      Users.addUser(user, function (err, user) {
-        if (err) {
-          throw err;
-        }
-        return res.send(user);
-      });
+    user.password = hash;
+    Users.addUser(user, function (err, user) {
+      if (err) {
+        throw err;
+      }
+      return res.send(user);
+    });
   });
 }
