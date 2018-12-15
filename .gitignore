@@ -7,5 +7,5 @@ mongodb/
 .gitignore
 error-logs.js
 .vscode/
-index.js
+*index.js
 dist/
