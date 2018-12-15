@@ -38,5 +38,8 @@ app.use(require('./students/students'));
 //students route
 app.use(require('./college/colleges'));
 
+//payment routes
+app.use(require('./instamojo/instamojo'));
+
 
 module.exports = router;
