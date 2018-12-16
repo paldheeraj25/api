@@ -41,5 +41,8 @@ app.use(require('./college/colleges'));
 //payment routes
 app.use(require('./instamojo/instamojo'));
 
+//dialogflow webhook
+app.use(require('./dialogflow-webhook/dialogflow-webhook'))
+
 
 module.exports = router;
