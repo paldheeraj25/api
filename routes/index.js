@@ -44,5 +44,8 @@ app.use(require('./instamojo/instamojo'));
 //dialogflow webhook
 app.use(require('./dialogflow-webhook/dialogflow-webhook'))
 
+//chatfuel
+app.use(require('./chatfuel/chatfuel'))
+
 
 module.exports = router;
