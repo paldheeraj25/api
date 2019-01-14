@@ -10,6 +10,9 @@ const _ = require('lodash');
 var InstaModule = require('./Insta');
 var Insta = InstaModule.Insta();
 
+// axios: http request
+const axios = require('axios')
+
 router.get('/api/chatfuel/prepare-payment',
   function (req, res) {
     // messengerUserId
@@ -195,7 +198,7 @@ router.post('/api/instamojo/webhook',
     let payment_type = "online";
     let payment_status;
     if (paymentStatus.status === 'Credit') {
-      chatfuelUrl = "https://api.chatfuel.com/bots/5c3a29f876ccbc01c23bbcbd/users/" + paymentStatus.buyer_name + "/send?chatfuel_token=4yMmTFsAEWBfHKLbXXfrpTdGE6jyklhmmhyV8IhFqXRLuLBT60RC5nwVHOpVUbIB&chatfuel_message_tag=PAYMENT_UPDATE&chatfuel_block_name=PaymentSuccessNotification";
+      chatfuelUrl = "https://api.chatfuel.com/bots/5c3b77ca76ccbc01c2c4abc0/users/" + paymentStatus.buyer_name + "/send?chatfuel_token=bNxRvihbjPJZTYygDNdb9EyWbC6CMGvQFmSfVNEgZoSTMFFZUW3y8k8ObWvbh5sC&chatfuel_message_tag=PAYMENT_UPDATE&chatfuel_block_name=PaymentSuccessNotification";
       console.log('this is chatfuel url');
       console.log(chatfuelUrl);
       payment_status = "online_success";
@@ -227,7 +230,7 @@ router.post('/api/instamojo/webhook',
       firebase.database().ref('send_them_flowers/orders/' + paymentStatus.payment_request_id)
         .once('value').then(function (snapshot) {
           if (snapshot.val().payment_type == "online") {
-            chatfuelUrl = "https://api.chatfuel.com/bots/5c3a29f876ccbc01c23bbcbd/users/" + paymentStatus.buyer_name + "/send?chatfuel_token=4yMmTFsAEWBfHKLbXXfrpTdGE6jyklhmmhyV8IhFqXRLuLBT60RC5nwVHOpVUbIB&chatfuel_message_tag=PAYMENT_UPDATE&chatfuel_block_name=PaymentFailNotification";
+            chatfuelUrl = "https://api.chatfuel.com/bots/5c3b77ca76ccbc01c2c4abc0/users/" + paymentStatus.buyer_name + "/send?chatfuel_token=bNxRvihbjPJZTYygDNdb9EyWbC6CMGvQFmSfVNEgZoSTMFFZUW3y8k8ObWvbh5sC&chatfuel_message_tag=PAYMENT_UPDATE&chatfuel_block_name=PaymentFailNotification";
           }
         });
     }

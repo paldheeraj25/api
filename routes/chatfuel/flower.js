@@ -41,7 +41,7 @@ function flowerListResponse(snapshot) {
       "subtitle": "price: " + childSnapshot.val().price + " Rs.",
       "buttons": [
         {
-          "url": "https://dry-plateau-78185.herokuapp.com/api/chatfuel/flower/select?flowerId=" + childSnapshot.key,
+          "url": "http://pinnacle.lewiot.com:5012/api/chatfuel/flower/select?flowerId=" + childSnapshot.key,
           "type": "json_plugin_url",
           "title": "Buy This"
         },

@@ -1,14 +1,18 @@
 var express = require('express'), router = express.Router();
-// instamojo configurations
-var Insta = require('instamojo-nodejs');
-Insta.setKeys('test_8ee3f513d3d06ec8e3de3149d11', 'test_c4dcc81e95a001669ee60a787fe');
-Insta.isSandboxMode(true);
 
-var dialogflowResponse = {}
-//get all
+// lodash
+const _ = require('lodash');
+
+const intentModule = require('./intents/intents');
+var dialogflowResponse = require('../../models/dialogflow-response.json');
+
 router.post('/api/dialoglow',
   function (req, res) {
-    res.send(dialogflowResponse)
+    fulfillmentRequest = req.body;
+    var intentResponse = '';
+    return intentModule.intents(fulfillmentRequest, function (response) {
+      return res.send(response);
+    });
   });
 
 module.exports = router;
