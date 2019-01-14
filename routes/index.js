@@ -7,9 +7,6 @@ var express = require('express'), router = express.Router();
 //users route
 app.use(require('./users/users'));
 
-// crypto ipl
-app.use(require('./cryptoipl/cryptoipl'));
-
 //product route
 app.use(require('./products/products'));
 
@@ -26,14 +23,8 @@ app.use(require('./appdata/appdata'));
 //ad route
 app.use(require('./advertisements/advertisements'));
 
-//grocery route
-app.use(require('./grocery/groceryController'));
-
 //auth route
 app.use(require('./auth/auth'));
-
-//students route
-app.use(require('./students/students'));
 
 //students route
 app.use(require('./college/colleges'));
@@ -46,6 +37,10 @@ app.use(require('./dialogflow-webhook/dialogflow-webhook'))
 
 //chatfuel
 app.use(require('./chatfuel/chatfuel'))
-
+app.use(require('./chatfuel/flower'))
+app.use(require('./chatfuel/cart'))
+app.use(require('./chatfuel/order-reciept'))
+app.use(require('./chatfuel/preapare-payment'))
+app.use(require('./chatfuel/track'))
 
 module.exports = router;

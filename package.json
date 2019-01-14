@@ -17,6 +17,7 @@
     "express-session": "^1.15.5",
     "express-validation": "^1.0.2",
     "express-validator": "^4.1.1",
+    "firebase": "^5.7.3",
     "instamojo-nodejs": "0.0.5",
     "joi": "^10.6.0",
     "js-csvparser": "^1.5.0",
