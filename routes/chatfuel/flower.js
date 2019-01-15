@@ -178,30 +178,52 @@ router.get('/api/chatfuel/user/address',
       "after_address": req.query["after_address"]
     };
 
-    const messagengeruserId = req.query["messenger user id"];
-    return firebase.database().ref('send_them_flowers/users/' + messagengeruserId).update({ address },
-      function (error) {
-        if (error) {
-          // The write failed...
-          message = {
-            "messages": [
-              {
-                "text": "there was an error",
-              },
-            ]
-          };
-          return res.send(message);
-        } else {
-          // Data saved successfully!
-          message = {
-            "messages": [
-              { "text": "I noted down your 🏠 address!!" },
-            ]
-          };
-          return res.send(message);
-        }
-      });
+    const messengerUserId = req.query["messenger user id"];
 
+    return validateUsermodule.validateUser(messengerUserId).then(data => {
+      if (data) {
+        return firebase.database().ref('send_them_flowers/users/' + messengerUserId).update({ address },
+          function (error) {
+            if (error) {
+              // The write failed...
+              message = {
+                "messages": [
+                  {
+                    "text": "there was an error",
+                  },
+                ]
+              };
+              return res.send(message);
+            } else {
+              // Data saved successfully!
+              message = {
+                "messages": [
+                  { "text": "I noted down your 🏠 address!!" },
+                ]
+              };
+              return res.send(message);
+            }
+          });
+      } else {
+        message = {
+          "messages": [
+            {
+              "text": "invalid user or flower",
+            },
+          ]
+        };
+        return res.send(message);
+      }
+    }).catch(err => {
+      message = {
+        "messages": [
+          {
+            "text": "invalid user or flower",
+          },
+        ]
+      };
+      return res.send(message);
+    });
   });
 
 router.get('/api/chatfuel/user/parcelname',
