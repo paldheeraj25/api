@@ -11,7 +11,7 @@ var InstaModule = require('./Insta');
 var Insta = InstaModule.Insta();
 
 // axios: http request
-const axios = require('axios')
+const axios = require('axios');
 
 router.get('/api/chatfuel/prepare-payment',
   function (req, res) {

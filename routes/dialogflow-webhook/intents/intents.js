@@ -1,6 +1,5 @@
-const flowersIntentModule = require('./flowers');
 const newAddressIntentModule = require('./edit-address');
-const dialogflowResponse = require('../../models/dialogflow-response.json');
+const dialogflowResponse = require('../../../models/dialogflow-response.json');
 //firebase
 var firebaseModule = require('../../chatfuel/firebase');
 var firebase = firebaseModule.firebase();
