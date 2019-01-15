@@ -241,14 +241,13 @@ router.post('/api/chatfuel/user/parcelname', validateUsermodule.validateUser,
       });
   });
 
-router.get('/api/chatfuel/user/phone-email',
+router.post('/api/chatfuel/user/phone-email', validateUsermodule.validateUser,
   function (req, res) {
     // messengerUserId
-    console.log(req.query);
     let message;
-    const phone = req.query['user_phone'];
-    const messagengeruserId = req.query["messenger user id"];
-    return firebase.database().ref('send_them_flowers/users/' + messagengeruserId).update({ phone: phone },
+    const phone = req.body['user_phone'];
+    const messengerUserId = req.body.authData.user.id;
+    return firebase.database().ref('send_them_flowers/users/' + messengerUserId).update({ phone: phone },
       function (error) {
         if (error) {
           // The write failed...
