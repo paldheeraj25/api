@@ -117,9 +117,9 @@ router.get('/api/chatfuel/flower/select',
     const flowerId = req.query['flowerId'];
     let message;
     // push selection in the user cart
-    return validateUsermodule.validateUser(messengerUserId)
-      .then(data => {
-        if (data && flowerId) {
+    return firebase.database().ref('send_them_flowers/users/' + messengerUserId).once('value')
+      .then(user => {
+        if (user.exists()) {
           return firebase.database().ref('send_them_flowers/flowers/' + flowerId).once('value').then(snapshot => {
             const flowerSnapshot = snapshot.val();
             message = {
@@ -159,52 +159,14 @@ router.get('/api/chatfuel/flower/select',
           message = {
             "messages": [
               {
-                "text": "invalid user or flower",
+                "text": "invalid user",
               },
             ]
           };
           return res.send(message);
         }
       })
-  });
-
-router.get('/api/chatfuel/user/address',
-  function (req, res) {
-    // messengerUserId
-    let message;
-    const address = {
-      "before_address": req.query["before_address"],
-      "city_address": req.query["city_address"],
-      "after_address": req.query["after_address"]
-    };
-
-    const messengerUserId = req.query["messenger user id"];
-
-    return validateUsermodule.validateUser(messengerUserId).then(data => {
-      if (data) {
-        return firebase.database().ref('send_them_flowers/users/' + messengerUserId).update({ address },
-          function (error) {
-            if (error) {
-              // The write failed...
-              message = {
-                "messages": [
-                  {
-                    "text": "there was an error",
-                  },
-                ]
-              };
-              return res.send(message);
-            } else {
-              // Data saved successfully!
-              message = {
-                "messages": [
-                  { "text": "I noted down your 🏠 address!!" },
-                ]
-              };
-              return res.send(message);
-            }
-          });
-      } else {
+      .catch(err => {
         message = {
           "messages": [
             {
@@ -213,25 +175,49 @@ router.get('/api/chatfuel/user/address',
           ]
         };
         return res.send(message);
-      }
-    }).catch(err => {
-      message = {
-        "messages": [
-          {
-            "text": "invalid user or flower",
-          },
-        ]
-      };
-      return res.send(message);
-    });
+      });
   });
 
-router.get('/api/chatfuel/user/parcelname',
+router.post('/api/chatfuel/user/address', validateUsermodule.validateUser,
   function (req, res) {
     // messengerUserId
     let message;
-    const messagengeruserId = req.query["messenger user id"];
-    return firebase.database().ref('send_them_flowers/users/' + messagengeruserId).update({ name: req.query['parcel_name'] },
+    const address = {
+      "before_address": req.body["before_address"],
+      "city_address": req.body["city_address"],
+      "after_address": req.body["after_address"]
+    };
+    const messengerUserId = req.body.authData.user.id;
+    return firebase.database().ref('send_them_flowers/users/' + messengerUserId).update({ address },
+      function (error) {
+        if (error) {
+          // The write failed...
+          message = {
+            "messages": [
+              {
+                "text": "there was an error",
+              },
+            ]
+          };
+          return res.send(message);
+        } else {
+          // Data saved successfully!
+          message = {
+            "messages": [
+              { "text": "I noted down your 🏠 address!!" },
+            ]
+          };
+          return res.send(message);
+        }
+      });
+  });
+
+router.post('/api/chatfuel/user/parcelname', validateUsermodule.validateUser,
+  function (req, res) {
+    // messengerUserId
+    let message;
+    const messengerUserId = req.body.authData.user.id;
+    return firebase.database().ref('send_them_flowers/users/' + messengerUserId).update({ name: req.body['parcel_name'] },
       function (error) {
         if (error) {
           // The write failed...
@@ -253,7 +239,6 @@ router.get('/api/chatfuel/user/parcelname',
           return res.send(message);
         }
       });
-
   });
 
 router.get('/api/chatfuel/user/phone-email',

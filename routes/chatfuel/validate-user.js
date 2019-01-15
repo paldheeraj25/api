@@ -1,14 +1,32 @@
-var firebaseModule = require('./firebase');
-var firebase = firebaseModule.firebase();
-//intent
-exports.validateUser = function (uid) {
-  return new Promise((resolve, reject) => {
-    let message;
-    return firebase.database().ref('send_them_flowers/users/' + uid + '/user_type').once('value')
-      .then(data => {
-        return resolve(data.exists())
-      }).catch(err => {
-        return reject(false);
+// jwt token
+var jwt = require('jsonwebtoken');
+
+exports.validateUser = function (req, res, next) {
+  const body = req.body;
+  const bearerToken = body['stf_api_token'];
+  let message;
+  if (typeof bearerToken !== 'undefined') {
+    jwt.verify(bearerToken, '',
+      (err, authData) => {
+        if (err) {
+          message = {
+            "messages": [
+              { "text": "invalid user token" },
+            ]
+          };
+          return res.send(err);;
+        } else {
+          req.body.authData = authData;
+          next();
+        }
       });
-  });
+  } else {
+    message = {
+      "messages": [
+        { "text": "invalid user" },
+      ]
+    };
+
+    return res.send(message);;
+  }
 }
