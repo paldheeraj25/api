@@ -2,14 +2,17 @@ var express = require('express'), router = express.Router();
 // lodash
 const _ = require('lodash');
 
-//firebase
+// firebase
 var firebaseModule = require('./firebase');
 var firebase = firebaseModule.firebase();
+// user-validatore
+var validateUsermodule = require('./validate-user');
 
 router.get('/api/chatfuel/flower/list',
   function (req, res) {
     // pagination
     let paginationId = req.query['pagination_id'];
+    const messengerUserId = req.query['messenger user id'];
     const limit = 10;
     // first time user
     if (paginationId === undefined || paginationId === null || paginationId == '0' || paginationId == 0) {
@@ -110,45 +113,59 @@ function flowerListResponse(snapshot) {
 router.get('/api/chatfuel/flower/select',
   function (req, res) {
     // messengerUserId
-    const messagengeruserId = req.query['messenger user id'];
+    const messengerUserId = req.query['messenger user id'];
     const flowerId = req.query['flowerId'];
     let message;
     // push selection in the user cart
-    // firebase.database().ref('send_them_flowers/users/cart' + messagengeruserId).push();
-    return firebase.database().ref('send_them_flowers/flowers/' + flowerId).once('value').then(snapshot => {
-      const flowerSnapshot = snapshot.val();
-      message = {
-        "messages": [
-          {
-            "text": "Superb! 👏🏻 " + flowerSnapshot.name + " is great choice 🌹 and added to cart 🛒 🛍️",
-            "quick_replies": [
+    return validateUsermodule.validateUser(messengerUserId)
+      .then(data => {
+        if (data && flowerId) {
+          return firebase.database().ref('send_them_flowers/flowers/' + flowerId).once('value').then(snapshot => {
+            const flowerSnapshot = snapshot.val();
+            message = {
+              "messages": [
+                {
+                  "text": "Superb! 👏🏻 " + flowerSnapshot.name + " is great choice 🌹 and added to cart 🛒 🛍️",
+                  "quick_replies": [
+                    {
+                      "title": "Continue shoping",
+                      "block_names": ["Flowers"]
+                    },
+                    {
+                      "title": "Checkout",
+                      "block_names": ["Empty Cart Check"]
+                    },
+                    {
+                      "title": "Cart 🛒",
+                      "block_names": ["Cart"]
+                    }
+                  ]
+                },
+              ]
+            };
+            flowerSnapshot.id = flowerId;
+            firebase.database().ref('send_them_flowers/users/' + messengerUserId + '/cart').push().set(flowerSnapshot);
+            return res.send(message);
+          }).catch(err => {
+            console.log(err);
+            message = {
+              "messages": [
+                { "text": "sorry selection is not available" },
+              ]
+            };
+            return res.send(message);
+          });
+        } else {
+          message = {
+            "messages": [
               {
-                "title": "Continue shoping",
-                "block_names": ["Flowers"]
+                "text": "invalid user or flower",
               },
-              {
-                "title": "Checkout",
-                "block_names": ["Empty Cart Check"]
-              },
-              {
-                "title": "Cart 🛒",
-                "block_names": ["Cart"]
-              }
             ]
-          },
-        ]
-      };
-      flowerSnapshot.id = flowerId;
-      firebase.database().ref('send_them_flowers/users/' + messagengeruserId + '/cart').push().set(flowerSnapshot);
-      return res.send(message);
-    }).catch(err => {
-      message = {
-        "messages": [
-          { "text": "sorry selection is not available" },
-        ]
-      };
-      return res.send(err);
-    });
+          };
+          return res.send(message);
+        }
+      })
   });
 
 router.get('/api/chatfuel/user/address',

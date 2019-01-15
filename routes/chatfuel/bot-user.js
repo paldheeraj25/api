@@ -12,13 +12,14 @@ router.get('/api/chatfuel/user/validate',
     let messageResponse;
     // if the key matches add the user other wise no
     // TODO: keep it in const later.
-    if (chatfuelApiKey === "") {
-      firebase.database().ref("send_them_flowers/users/" + messagengeruserId).update({ "userId": messagengeruserId }).then(function (data) {
+    if (chatfuelApiKey === "send_them_flowers_4594043041") {
+      return firebase.database().ref("send_them_flowers/users/" + messagengeruserId).update({ "user_type": "bot" }).then(function (data) {
         messageResponse = {
-          "messages": [
-            { "text": "Valid bot user" },
-          ]
-        }
+          "set_attributes":
+          {
+            "user_type": "bot",
+          }
+        };
         return res.send(messageResponse);
       }).catch(err => {
         messageResponse = {
