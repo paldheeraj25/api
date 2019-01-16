@@ -3,6 +3,10 @@ var express = require('express'), router = express.Router();
 var firebaseModule = require('./firebase');
 var firebase = firebaseModule.firebase();
 
+// import validator
+var validateUsermodule = require('./validate-user');
+
+
 // lodash
 const _ = require('lodash');
 
@@ -13,10 +17,10 @@ var Insta = InstaModule.Insta();
 // axios: http request
 const axios = require('axios');
 
-router.get('/api/chatfuel/prepare-payment',
+router.post('/api/chatfuel/prepare-payment', validateUsermodule.validateUser,
   function (req, res) {
     // messengerUserId
-    const messengerUserId = req.query['messenger user id'];
+    const messengerUserId = req.body.authData.user.id;;
     let cartPrice = 0;
     // get the user to prepare order
     firebase.database().ref('send_them_flowers/users/' + messengerUserId).once('value').then(snapshot => {
@@ -55,10 +59,12 @@ function makePayment(orderObject, callback) {
     // save the order object using payment id
     console.log(responseJson.success)
     if (responseJson.success === false) {
+      // TODO: redirect to change phone number block phone number error
       message = {
         "messages": [
           {
-            "text": "Sorry Payment failed",
+            "text": "Sorry Payment failed, Please provide valid phone number",
+            "redirect_to_blocks": ["Phone Number"]
           }
         ]
       };
