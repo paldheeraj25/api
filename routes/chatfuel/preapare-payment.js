@@ -17,35 +17,46 @@ var Insta = InstaModule.Insta();
 // axios: http request
 const axios = require('axios');
 
-router.post('/api/chatfuel/prepare-payment', validateUsermodule.validateUser,
+router.get('/api/chatfuel/prepare-payment',
   function (req, res) {
     // messengerUserId
-    const messengerUserId = req.body.authData.user.id;;
+    const messengerUserId = req.query["messenger user id"];
     let cartPrice = 0;
     // get the user to prepare order
     firebase.database().ref('send_them_flowers/users/' + messengerUserId).once('value').then(snapshot => {
+      if (snapshot.exists()) {
+        _.forEach(snapshot.val().cart, function (cartItem) {
+          cartPrice = cartPrice + cartItem.price;
+        });
+        let orderObject = {};
+        // Insta module object
+        const data = new Insta.PaymentData();
+        data.purpose = 'Send Them Flowers Shopping'; //req.body.purpose;
+        data.amount = '9';//cartPrice;//req.body.amount;
+        data.buyer_name = messengerUserId//req.body via database;
+        data.redirect_url = 'https://paldheeraj25.github.io/';//req.body.redirect_url;
+        data.email = 'paldheeraj25@gmail.com';//req.body.email;
+        data.phone = snapshot.val().phone;//req.body.phone;
+        data.send_email = false;
+        data.webhook = 'http://pinnacle.lewiot.com:5012/api/instamojo/webhook';
+        data.send_sms = false;
+        data.allow_repeated_payments = false;
+        orderObject.data = data;
+        orderObject.userInfo = snapshot.val();
+        return makePayment(orderObject, function (response) {
+          return res.send(response);
+        });
+      } else {
+        const message = {
+          "messages": [
+            {
+              "text": "invalid user."
+            }
+          ]
+        };
+        return res.send(message);
+      }
 
-      _.forEach(snapshot.val().cart, function (cartItem) {
-        cartPrice = cartPrice + cartItem.price;
-      });
-      let orderObject = {};
-      // Insta module object
-      const data = new Insta.PaymentData();
-      data.purpose = 'Send Them Flowers Shopping'; //req.body.purpose;
-      data.amount = '9';//cartPrice;//req.body.amount;
-      data.buyer_name = messengerUserId//req.body via database;
-      data.redirect_url = 'https://paldheeraj25.github.io/';//req.body.redirect_url;
-      data.email = 'paldheeraj25@gmail.com';//req.body.email;
-      data.phone = snapshot.val().phone;//req.body.phone;
-      data.send_email = false;
-      data.webhook = 'http://pinnacle.lewiot.com:5012/api/instamojo/webhook';
-      data.send_sms = false;
-      data.allow_repeated_payments = false;
-      orderObject.data = data;
-      orderObject.userInfo = snapshot.val();
-      return makePayment(orderObject, function (response) {
-        return res.send(response);
-      });
     }).catch(err => {
       return res.send(err)
     });
@@ -98,6 +109,7 @@ function makePayment(orderObject, callback) {
       _.forEach(orderObject.userInfo.cart, function (item) {
         items = item.name + ", " + items;
       });
+      console.log("http://pinnacle.lewiot.com:5012/api/chatfuel/cash-on-delivery?id=" + responseJson.payment_request.id + "&uid=" + responseJson.payment_request.buyer_name);
       let responseObject = {
         "messages": [
           {
@@ -145,53 +157,65 @@ router.get('/api/chatfuel/cash-on-delivery/',
     const paymentRequestId = req.query['id'];
     const messengerUserId = req.query['uid'];
     let message;
-    firebase.database().ref("send_them_flowers/orders/" + paymentRequestId).once("value")
+    return firebase.database().ref("send_them_flowers/orders/" + paymentRequestId).once("value")
       .then(function (snapshot) {
-        firebase.database().ref("send_them_flowers/orders/" + paymentRequestId).update({
-          "payment_type": "cash_on_delivery",
-          "payment_notify": "1",
-          "payment_status": "cash_on_delivery"
-        }, function (err) {
-          if (err) {
-            // The write failed...
-            console.log('order data save failed');
-            console.log(err);
-            message = {
-              "messages": [
-                {
-                  "text": "sorry store is unable to deliver cash on delivery right now."
-                }
-              ]
-            };
-            return res.send(message);
-          } else {
-            // Data saved successfully!
-            firebase.database().ref('send_them_flowers/users/' + messengerUserId).once('value').then((snapshot) => {
-              firebase.database().ref('send_them_flowers/users/' + messengerUserId + '/order_history').push()
-                .set(paymentRequestId, function (err) {
-                  if (err) {
-                    // to-do: handle in future
-                    console.log('order history data not set')
-                  } else {
-                    console.log('order added to order_history, now vacating cart');
-                    firebase.database().ref('send_them_flowers/users/' + messengerUserId + '/cart').remove();
-                    firebase.database().ref('send_them_flowers/users/' + messengerUserId + '/message').remove();
-                  }
-                });
-            });
-            firebase.database().ref("send_them_flowers/orders/" + paymentRequestId).once('value').then(function (snapshot) {
+        if (snapshot.exists() && snapshot.val().user_id === messengerUserId) {
+          firebase.database().ref("send_them_flowers/orders/" + paymentRequestId).update({
+            "payment_type": "cash_on_delivery",
+            "payment_notify": "1",
+            "payment_status": "cash_on_delivery"
+          }, function (err) {
+            if (err) {
+              // The write failed...
+              console.log('order data save failed');
+              console.log(err);
               message = {
-                "set_attributes":
-                {
-                  "payment_tracking_id": paymentRequestId,
-                  "order_amount": snapshot.val().amount
-                },
-                "redirect_to_blocks": ["Cash On Delivery"]
-              }
+                "messages": [
+                  {
+                    "text": "sorry store is unable to deliver cash on delivery right now."
+                  }
+                ]
+              };
               return res.send(message);
-            });
-          }
-        });
+            } else {
+              // Data saved successfully!
+              firebase.database().ref('send_them_flowers/users/' + messengerUserId).once('value').then((snapshot) => {
+                firebase.database().ref('send_them_flowers/users/' + messengerUserId + '/order_history').push()
+                  .set(paymentRequestId, function (err) {
+                    if (err) {
+                      // to-do: handle in future
+                      console.log('order history data not set')
+                    } else {
+                      console.log('order added to order_history, now vacating cart');
+                      firebase.database().ref('send_them_flowers/users/' + messengerUserId + '/cart').remove();
+                      firebase.database().ref('send_them_flowers/users/' + messengerUserId + '/message').remove();
+                    }
+                  });
+              });
+              firebase.database().ref("send_them_flowers/orders/" + paymentRequestId).once('value').then(function (snapshot) {
+                message = {
+                  "set_attributes":
+                  {
+                    "payment_tracking_id": paymentRequestId,
+                    "order_amount": snapshot.val().amount
+                  },
+                  "redirect_to_blocks": ["Cash On Delivery"]
+                }
+                return res.send(message);
+              });
+            }
+          });
+        } else {
+          message = {
+            "messages": [
+              {
+                "text": "sorry payment request for cash on delivery in invalid."
+              }
+            ]
+          };
+          return res.send(message);
+        }
+
       });
   })
 
