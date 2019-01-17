@@ -68,7 +68,6 @@ function makePayment(orderObject, callback) {
     let message;
     // todo: put a condition for wrong phone number
     // save the order object using payment id
-    console.log(responseJson.success)
     if (responseJson.success === false) {
       // TODO: redirect to change phone number block phone number error
       message = {
@@ -109,7 +108,6 @@ function makePayment(orderObject, callback) {
       _.forEach(orderObject.userInfo.cart, function (item) {
         items = item.name + ", " + items;
       });
-      console.log("http://pinnacle.lewiot.com:5012/api/chatfuel/cash-on-delivery?id=" + responseJson.payment_request.id + "&uid=" + responseJson.payment_request.buyer_name);
       let responseObject = {
         "messages": [
           {

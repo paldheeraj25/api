@@ -3,14 +3,18 @@ var express = require('express'), router = express.Router();
 var firebaseModule = require('./firebase');
 var firebase = firebaseModule.firebase();
 
+// user validate
+var validateUsermodule = require('./validate-user');
+
 // lodash
 const _ = require('lodash');
 
-router.get('/api/chatfuel/order/track/list',
+router.post('/api/chatfuel/order/track/list', validateUsermodule.validateUser,
   function (req, res) {
     // messengerUserId
     let message;
-    const messengerId = req.query["messenger user id"];
+    const messengerId = req.body.authData.user.id;
+
     firebase.database().ref("send_them_flowers/users/" + messengerId + "/order_history").once('value').then(function (snapshot) {
       let ordersCount = 1;
       let ordersArray = [];
@@ -56,11 +60,11 @@ router.get('/api/chatfuel/order/track/list',
   });
 
 
-router.get('/api/chatfuel/order/track/details',
+router.post('/api/chatfuel/order/track/details', validateUsermodule.validateUser,
   function (req, res) {
     // messengerUserId
     let message;
-    const orderId = req.query["order_id"];
+    const orderId = req.body["order_id"];
     firebase.database().ref("send_them_flowers/orders/" + orderId + "/order_detail/cart").once('value').then(function (snapshot) {
       let orderItems = [];
       let orderDetail;
@@ -90,11 +94,11 @@ router.get('/api/chatfuel/order/track/details',
     })
   });
 
-router.get('/api/chatfuel/order/track/status',
+router.post('/api/chatfuel/order/track/status', validateUsermodule.validateUser,
   function (req, res) {
     // messengerUserId
     let message;
-    const orderId = req.query["order_id"];
+    const orderId = req.body["order_id"];
     firebase.database().ref("send_them_flowers/orders/" + orderId).once('value').then(function (snapshot) {
       let message = {
         "set_attributes":
@@ -109,10 +113,10 @@ router.get('/api/chatfuel/order/track/status',
     })
   });
 
-router.get('/api/chatfuel/order/track/cancel',
+router.post('/api/chatfuel/order/track/cancel', validateUsermodule.validateUser,
   function (req, res) {
     console.log(req.query);
-    const orderId = req.query['order_id'];
+    const orderId = req.body['order_id'];
     firebase.database().ref("/send_them_flowers/orders/" + orderId).update({ "delivery_status": "cancelled" }, function (err) {
       console.log('order cancelled with Id ' + orderId);
       if (err) {
