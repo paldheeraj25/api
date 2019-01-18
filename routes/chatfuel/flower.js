@@ -277,11 +277,16 @@ router.post('/api/chatfuel/user/phone-email', validateUsermodule.validateUser,
 router.post('/api/chatfuel/flower/dashboard/upload',
   function (req, res) {
     // messengerUserId
-    console.log(req.query);
     const flower = req.body;
     flower['image-collection'] = flower.gallery;
-    const messagengeruserId = req.query["messenger user id"];
-    return firebase.database().ref('send_them_flowers/flowers/').push().set(flower,
+    let dataRef;
+    if (flower.person != "null") {
+      dataRef = firebase.database().ref('send_them_flowers/person/' + flower.person);
+    } else {
+      dataRef = firebase.database().ref('send_them_flowers/flowers/');
+    }
+
+    return dataRef.push().set(flower,
       function (error) {
         if (error) {
           return res.send('flower upload unsuccessful');
@@ -291,7 +296,6 @@ router.post('/api/chatfuel/flower/dashboard/upload',
           return res.send(message);
         }
       });
-
   });
 
 router.get('/api/dashboard/flower/list',

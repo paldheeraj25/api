@@ -32,7 +32,7 @@ router.get('/api/chatfuel/prepare-payment',
         // Insta module object
         const data = new Insta.PaymentData();
         data.purpose = 'Send Them Flowers Shopping'; //req.body.purpose;
-        data.amount = '9';//cartPrice;//req.body.amount;
+        data.amount = '9';// TODO: cartPrice;//req.body.amount;
         data.buyer_name = messengerUserId//req.body via database;
         data.redirect_url = 'https://paldheeraj25.github.io/';//req.body.redirect_url;
         data.email = 'paldheeraj25@gmail.com';//req.body.email;
