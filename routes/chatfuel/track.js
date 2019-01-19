@@ -47,7 +47,7 @@ router.post('/api/chatfuel/order/track/list', validateUsermodule.validateUser,
               "quick_replies": [
                 {
                   "title": "Keep Shopping",
-                  "block_names": ["Flowers"]
+                  "block_names": ["start person type"]
                 }
               ]
             }

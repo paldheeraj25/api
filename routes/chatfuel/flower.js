@@ -7,6 +7,14 @@ var firebaseModule = require('./firebase');
 var firebase = firebaseModule.firebase();
 // user-validatore
 var validateUsermodule = require('./validate-user');
+const personTypes = {
+  "gf or bf": "gfBf",
+  "wife or husband": "wifeHusband",
+  "mom or dad": "momDad",
+  "best or close friend": "bestFriend",
+  "friend or relative": "friendRelative",
+  "others": "friendRelative"
+}
 
 router.get('/api/chatfuel/flower/list',
   function (req, res) {
@@ -14,16 +22,19 @@ router.get('/api/chatfuel/flower/list',
     let paginationId = req.query['pagination_id'];
     const messengerUserId = req.query['messenger user id'];
     const limit = 10;
+    // person_type check
+    const personType = personTypes[req.query['person_type']];
+
     // first time user
     if (paginationId === undefined || paginationId === null || paginationId == '0' || paginationId == 0) {
-      return firebase.database().ref('send_them_flowers/flowers').orderByKey().limitToFirst(limit).once('value').then(function (snapshot) {
-        return flowerListResponse(snapshot).then(function (resMessageResponse) {
+      return firebase.database().ref('send_them_flowers/person/' + personType).orderByKey().limitToFirst(limit).once('value').then(function (snapshot) {
+        return flowerListResponse(snapshot, personType).then(function (resMessageResponse) {
           res.send(resMessageResponse);
         });
       });
     } else {
-      return firebase.database().ref('send_them_flowers/flowers').orderByKey().startAt(paginationId).limitToFirst(limit).once('value').then(function (snapshot) {
-        return flowerListResponse(snapshot).then(function (resMessageResponse) {
+      return firebase.database().ref('send_them_flowers/person/' + personType).orderByKey().startAt(paginationId).limitToFirst(limit).once('value').then(function (snapshot) {
+        return flowerListResponse(snapshot, personType).then(function (resMessageResponse) {
           res.send(resMessageResponse);
         });
       });
@@ -31,7 +42,7 @@ router.get('/api/chatfuel/flower/list',
   });
 
 // flowerListReponse
-function flowerListResponse(snapshot) {
+function flowerListResponse(snapshot, personType) {
   let flower;
   let flowers = [];
   let next;
@@ -60,11 +71,13 @@ function flowerListResponse(snapshot) {
   });
   next = _.last(paginationIdArray);
   paginationIdArray = [];
-  return firebase.database().ref('send_them_flowers/flowers').orderByKey().endAt(next).once('value').then(function (dataSnapshot) {
+  return firebase.database().ref('send_them_flowers/person/' + personType).orderByKey().endAt(next).once('value').then(function (dataSnapshot) {
     paginationIdArray = [];
     dataSnapshot.forEach(function (childDataSnapshot) {
       paginationIdArray.push(childDataSnapshot.key);
     });
+    console.log(_.head(_.takeRight(paginationIdArray, 20)));
+    console.log(_.last(_.takeRight(paginationIdArray, 20)));
     return {
       "messages": [
         {
@@ -115,12 +128,13 @@ router.get('/api/chatfuel/flower/select',
     // messengerUserId
     const messengerUserId = req.query['messenger user id'];
     const flowerId = req.query['flowerId'];
+    const personType = personTypes[req.query['person_type']];
     let message;
     // push selection in the user cart
     return firebase.database().ref('send_them_flowers/users/' + messengerUserId).once('value')
       .then(user => {
         if (user.exists()) {
-          return firebase.database().ref('send_them_flowers/flowers/' + flowerId).once('value').then(snapshot => {
+          return firebase.database().ref('send_them_flowers/person/' + personType + '/' + flowerId).once('value').then(snapshot => {
             const flowerSnapshot = snapshot.val();
             message = {
               "messages": [
@@ -128,8 +142,8 @@ router.get('/api/chatfuel/flower/select',
                   "text": "Superb! 👏🏻 " + flowerSnapshot.name + " is great choice 🌹 and added to cart 🛒 🛍️",
                   "quick_replies": [
                     {
-                      "title": "Continue shoping",
-                      "block_names": ["Flowers"]
+                      "title": "Keep shoping",
+                      "block_names": ["start person type"]
                     },
                     {
                       "title": "Checkout",
@@ -303,7 +317,14 @@ router.get('/api/dashboard/flower/list',
     // messengerUserId
     let flowers = [];
     let flower;
-    return firebase.database().ref('send_them_flowers/flowers').once('value').then(snapshot => {
+    const person = req.query['person'];
+    let dataRef;
+    if (person == 'null' || person == undefined) {
+      dataRef = firebase.database().ref('send_them_flowers/flowers');
+    } else {
+      dataRef = firebase.database().ref('send_them_flowers/person/' + person);
+    }
+    return dataRef.once('value').then(snapshot => {
       snapshot.forEach(function (childSnapshot) {
         flower = childSnapshot.val();
         flower.id = childSnapshot.key;
@@ -331,8 +352,15 @@ router.get('/api/dashboard/flower/orders',
 router.get('/api/dashboard/flower/select',
   function (req, res) {
     // messengerUserId
-    let flowerId = req.query['id']
-    return firebase.database().ref('send_them_flowers/flowers/' + flowerId).once('value').then(snapshot => {
+    let flowerId = req.query['id'];
+    const person = req.query['person'];
+    let dataRef;
+    if (person == 'null' || person == undefined) {
+      dataRef = firebase.database().ref('send_them_flowers/flowers/' + flowerId);
+    } else {
+      dataRef = firebase.database().ref('send_them_flowers/person/' + person + '/' + flowerId);
+    }
+    return dataRef.once('value').then(snapshot => {
       return res.send(snapshot.val());
     })
   });
@@ -340,15 +368,21 @@ router.get('/api/dashboard/flower/select',
 router.post('/api/dashboard/flower/select/edit/:id',
   function (req, res) {
     // messengerUserId
-    console.log(req.body)
     let flowerId = req.params.id;
-    let flower = req.body
-    return firebase.database().ref('send_them_flowers/flowers/' + flowerId).update(flower).then(data => {
+    let flower = req.body.flower;
+    const person = req.body.person;
+    let dataRef;
+    if (person == 'null' || person == undefined) {
+      dataRef = firebase.database().ref('send_them_flowers/flowers/' + flowerId);
+    } else {
+      dataRef = firebase.database().ref('send_them_flowers/person/' + person + '/' + flowerId);
+    }
+    return dataRef.update(flower).then(data => {
       return res.send({ "status": "success" });
     }).catch(err => {
       console.log(err);
       return res.send(err);
-    })
+    });
   });
 
 

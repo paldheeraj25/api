@@ -11,7 +11,7 @@ router.post('/api/chatfuel/person/type', //validateUsermodule.validateUser,
     const message = {
       "messages": [
         {
-          "text": "I am Laxmi ur flower astrology specialist!  ,! 🥰 😍😍  select 👇🏻  the person and find the flowers 🌹 which compliment their energy ⚡ and vibrations 🌌..",
+          "text": "select 👇🏻  the person and find the flowers 🌹 which compliment their energy ⚡ and vibrations 🌌..",
           "quick_replies": [
             {
               "title": "gf / bf",
