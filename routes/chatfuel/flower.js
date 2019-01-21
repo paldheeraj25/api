@@ -27,18 +27,43 @@ router.get('/api/chatfuel/flower/list',
     const personType = personTypes[req.query['person_type']];
 
     // first time user
-    if (paginationId === undefined || paginationId === null || paginationId == '0' || paginationId == 0) {
-      return firebase.database().ref('send_them_flowers/person/' + personType).orderByKey().limitToFirst(limit).once('value').then(function (snapshot) {
-        return flowerListResponse(snapshot, personType).then(function (resMessageResponse) {
-          res.send(resMessageResponse);
+    if (personType) {
+      if (paginationId === undefined || paginationId === null || paginationId == '0' || paginationId == 0) {
+        return firebase.database().ref('send_them_flowers/person/' + personType).orderByKey().limitToFirst(limit).once('value').then(function (snapshot) {
+          return flowerListResponse(snapshot, personType).then(function (resMessageResponse) {
+            res.send(resMessageResponse);
+          });
         });
-      });
+      } else {
+        return firebase.database().ref('send_them_flowers/person/' + personType).orderByKey().startAt(paginationId).limitToFirst(limit).once('value').then(function (snapshot) {
+          return flowerListResponse(snapshot, personType).then(function (resMessageResponse) {
+            res.send(resMessageResponse);
+          });
+        });
+      }
     } else {
-      return firebase.database().ref('send_them_flowers/person/' + personType).orderByKey().startAt(paginationId).limitToFirst(limit).once('value').then(function (snapshot) {
-        return flowerListResponse(snapshot, personType).then(function (resMessageResponse) {
-          res.send(resMessageResponse);
-        });
-      });
+      const messageResponse = {
+        "messages": [
+          {
+            "text": "sorry , Please select the person to match the flowers energy",
+            "quick_replies": [
+              {
+                "title": "Keep shoping",
+                "block_names": ["start person type"]
+              },
+              {
+                "title": "Checkout",
+                "block_names": ["Empty Cart Check"]
+              },
+              {
+                "title": "Cart 🛒",
+                "block_names": ["Cart"]
+              }
+            ]
+          },
+        ]
+      };
+      return res.send(messageResponse);
     }
   });
 
@@ -53,7 +78,8 @@ function flowerListResponse(snapshot, personType) {
     flower = {
       "title": childSnapshot.val().name,
       "image_url": childSnapshot.val().image,
-      "subtitle": "Rs: " + strikeThroughText(childSnapshot.val().price.toString()),
+      "subtitle": strikeThroughText(("Rs: " + ((5 / 3) * childSnapshot.val().price).toString()).substring(0, 11)) + ' 40% OFF 🔥 💖 RS. ' +
+        childSnapshot.val().price.toString() + ' 💖',
       "buttons": [
         {
           "url": "http://pinnacle.lewiot.com:5012/api/chatfuel/flower/select?flowerId=" + childSnapshot.key,
