@@ -1,7 +1,8 @@
 var express = require('express'), router = express.Router();
 // lodash
 const _ = require('lodash');
-
+// strike
+var strikeThroughText = require('strikethrough');
 // firebase
 var firebaseModule = require('./firebase');
 var firebase = firebaseModule.firebase();
@@ -52,7 +53,7 @@ function flowerListResponse(snapshot, personType) {
     flower = {
       "title": childSnapshot.val().name,
       "image_url": childSnapshot.val().image,
-      "subtitle": "price: " + childSnapshot.val().price + " Rs.",
+      "subtitle": "Rs: " + strikeThroughText(childSnapshot.val().price.toString()),
       "buttons": [
         {
           "url": "http://pinnacle.lewiot.com:5012/api/chatfuel/flower/select?flowerId=" + childSnapshot.key,
