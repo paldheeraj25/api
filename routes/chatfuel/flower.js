@@ -88,7 +88,8 @@ function flowerListResponse(snapshot, personType) {
         },
         {
           "type": "web_url",
-          "url": "https://dry-plateau-78185.herokuapp.com/#/flower/details?flowerId=" + childSnapshot.key,
+          "url": "https://peaceful-mercury.glitch.me/flower/glitch?name=" + childSnapshot.key + "&person="
+            + childSnapshot.val().person,
           "title": "View Item"
         }
       ]
