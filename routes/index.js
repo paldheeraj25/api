@@ -9,6 +9,8 @@ app.use(require('./users/users'));
 
 //product route
 app.use(require('./products/products'));
+app.use(require('./products/backflow-burner'));
+app.use(require('./products/product-payment'));
 
 //jewel route
 app.use(require('./jewel/jewel'));
