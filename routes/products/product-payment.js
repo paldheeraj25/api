@@ -23,9 +23,9 @@ router.post('/api/product/prepare-payment',
     // Insta module object
     const data = new Insta.PaymentData();
     data.purpose = product.item + ' Shopping'; //req.body.purpose;
-    data.amount = product.price.toString();
+    data.amount = product.price.toString();// 
     data.buyer_name = product.name//req.body via database;
-    data.redirect_url = 'https://paldheeraj25.github.io/';//req.body.redirect_url;
+    data.redirect_url = "http://localhost:4200/shop/payment-notice";//TODO: Need to change
     data.email = product.email;//req.body.email;
     data.phone = product.phone;//req.body.phone;
     data.send_email = false;
@@ -155,6 +155,18 @@ router.get('/api/product/cash-on-delivery/',
 
       });
   })
+
+router.post('/api/product/get-order',
+  function (req, res) {
+    // messengerUserId
+    const orderId = req.body['order_id'];
+    return firebase.database().ref('send_them_flowers/orders/' + orderId).once('value').then(snapshot => {
+      return res.send(snapshot.val());
+    }).catch(err => {
+      return res.send(err);
+    })
+  });
+
 
 
 // router.get('/api/chatfuel/refresh',
