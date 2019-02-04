@@ -18,5 +18,17 @@ router.get('/api/products/backflow-burder/detail',
       });
   });
 
+router.get('/api/products/backflow-burder/list',
+  function (req, res) {
+    // messengerUserId
+    const id = req.query["id"];
+    firebase.database().ref('send_them_flowers/prodcuts/backflowburner/').once('value')
+      .then(function (snapshot) {
+        return res.send(snapshot);
+      }).catch(err => {
+        return res.send(err);
+      });
+  });
+
 
 module.exports = router;
