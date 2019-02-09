@@ -20,24 +20,52 @@ router.post('/api/product/prepare-payment',
     // messengerUserId
     const product = req.body;
     let orderObject = {};
-    // Insta module object
-    const data = new Insta.PaymentData();
-    data.purpose = product.item + ' Shopping'; //req.body.purpose;
-    data.amount = product.price.toString();// 
-    data.buyer_name = product.name//req.body via database;
-    data.redirect_url = "http://localhost:4200/shop/payment-notice";//TODO: Need to change
-    data.email = product.email;//req.body.email;
-    data.phone = product.phone;//req.body.phone;
-    data.send_email = false;
-    // data.webhook = 'http://pinnacle.lewiot.com:5012/api/instamojo/webhook';
-    data.send_sms = false;
-    data.allow_repeated_payments = false;
-    orderObject.data = data;
-    orderObject.cart = product;
-    return makePayment(orderObject, function (response) {
-      return res.send(response);
-    });
+    // check if the order is cash on delivery
+    if (product.paymentType == "cod") {
+      orderObject = {
+        address: product.address,
+        amount: product.price.toString(),
+        delivery_status: "Not Delivered",
+        order_detail: product.item,
+        order_date: new Date().toDateString(),
+        payment_status: 'pending',
+        payment_type: "cash_on_delivery",
+        phone_number: product.phone,
+        user_id: product.email,
+        payment_notify: "0",
+        order_detail: product
+      };
+      // data ref
+      let dataRef = firebase.database().ref("send_them_flowers/orders/").push();
+      return dataRef.set(orderObject, function (err) {
+        if (err) {
+          return res.send(err);
+        } else {
+          orderObject.key = dataRef.key;
+          return res.send(orderObject);
+        }
+      })
+      return true;
+    } else {
 
+      // Insta module object
+      const data = new Insta.PaymentData();
+      data.purpose = product.item + ' Shopping'; //req.body.purpose;
+      data.amount = product.price.toString();// 
+      data.buyer_name = product.name//req.body via database;
+      data.redirect_url = "http://localhost:4200/shop/payment-notice";//TODO: Need to change
+      data.email = product.email;//req.body.email;
+      data.phone = product.phone;//req.body.phone;
+      data.send_email = false;
+      // data.webhook = 'http://pinnacle.lewiot.com:5012/api/instamojo/webhook';
+      data.send_sms = false;
+      data.allow_repeated_payments = false;
+      orderObject.data = data;
+      orderObject.cart = product;
+      return makePayment(orderObject, function (response) {
+        return res.send(response);
+      });
+    }
   });
 
 function makePayment(orderObject, callback) {
