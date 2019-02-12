@@ -367,14 +367,35 @@ router.get('/api/dashboard/flower/orders',
     // messengerUserId
     let orders = [];
     let order;
-    return firebase.database().ref('send_them_flowers/orders').once('value').then(snapshot => {
-      snapshot.forEach(function (childSnapshot) {
-        order = childSnapshot.val();
-        order.id = childSnapshot.key;
-        orders.push(order);
-      });
-      return res.send(orders);
-    })
+    let orderStatus = req.query['orderStatus'];
+    if (orderStatus == "not_delivered" || orderStatus == "Not Delivered") {
+      return firebase.database().ref('send_them_flowers/orders').orderByChild("delivery_status").equalTo("Not Delivered").once('value').then(snapshot => {
+        snapshot.forEach(function (childSnapshot) {
+          order = childSnapshot.val();
+          order.id = childSnapshot.key;
+          orders.push(order);
+        });
+        return res.send(orders);
+      })
+    } else if (orderStatus == "shipped") {
+      return firebase.database().ref('send_them_flowers/orders').orderByChild("delivery_status").equalTo("shipped").once('value').then(snapshot => {
+        snapshot.forEach(function (childSnapshot) {
+          order = childSnapshot.val();
+          order.id = childSnapshot.key;
+          orders.push(order);
+        });
+        return res.send(orders);
+      })
+    } else if (orderStatus == "delivered") {
+      return firebase.database().ref('send_them_flowers/orders').orderByChild("delivery_status").equalTo("delivered").once('value').then(snapshot => {
+        snapshot.forEach(function (childSnapshot) {
+          order = childSnapshot.val();
+          order.id = childSnapshot.key;
+          orders.push(order);
+        });
+        return res.send(orders);
+      })
+    }
   });
 
 router.get('/api/dashboard/flower/select',
