@@ -195,6 +195,24 @@ router.post('/api/product/get-order',
     })
   });
 
+router.post('/api/product/shipped/:id',
+  function (req, res) {
+    // messengerUserId
+    const orderId = req.params.id;
+    let dataRef = firebase.database().ref('send_them_flowers/orders/' + orderId);
+    return dataRef.once('value').then(snapshot => {
+      if (snapshot.exists()) {
+        dataRef.update({ "delivery_status": "shipped" }, function (err) {
+          if (!err) {
+            return res.send({ "status": "success" });
+          }
+        });
+      }
+    }).catch(err => {
+      return res.send(err);
+    })
+  });
+
 
 
 // router.get('/api/chatfuel/refresh',
