@@ -42,5 +42,17 @@ router.get('/api/products/juice/list',
       });
   });
 
+router.get('/api/products/juice/detail',
+  function (req, res) {
+    // messengerUserId
+    const id = req.query["id"];
+    firebase.database().ref('send_them_flowers/juice-list/' + id).once('value')
+      .then(function (snapshot) {
+        return res.send(snapshot);
+      }).catch(err => {
+        return res.send(err);
+      });
+  });
+
 
 module.exports = router;
